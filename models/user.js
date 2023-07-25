@@ -92,7 +92,7 @@ class User {
             is_client, 
             is_nutritionist
             )
-           VALUES ($1, $2, $3, $4, $5, $6)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
            RETURNING username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin, is_client AS "isClient", is_nutritionist AS "isNutritionist""`,
       [
         username,
