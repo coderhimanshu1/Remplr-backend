@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS nutrients (
 );
 
 -- recipetoingredients table
-CREATE TABLE IF NOT EXISTS recipetoingredients (
+CREATE TABLE IF NOT EXISTS recipe_ingredients (
     id INT PRIMARY KEY,
     recipe_id INT,
     ingredient_id INT,
