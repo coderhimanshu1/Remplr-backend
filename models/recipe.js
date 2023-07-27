@@ -1,5 +1,3 @@
-// TODO: Fix this model
-
 "use strict";
 
 const db = require("../db");
@@ -16,14 +14,36 @@ class Recipe {
 
   static async create(data) {
     const result = await db.query(
-      `INSERT INTO recipes (aisle,
+      `INSERT INTO recipes ( vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
         image,
-        name,
-        amount,
-        unit,
-        original)
+        imagetype,
+        dishtype,
+        diets,
+        summary)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, aisle, image, name, amount, unit, original as details"`,
+           RETURNING id,  
+           vegetarian,
+           vegan,
+           dairyfree,
+           weightwatchersmartpoints,
+           creditstext,
+           title,
+           readyinminutes,
+           servings,
+           sourceurl,
+           image,
+           imagetype as "imageType",
+           dishtype as "dishTypes",
+           diets,
+           summary`,
       [data.aisle, data.image, data.name, data.amount, data.unit, data.original]
     );
     let recipe = result.rows[0];
@@ -37,17 +57,26 @@ class Recipe {
    * */
 
   static async findAll() {
-    let query = `SELECT i.id,
-                        i.aisle,
-                        i.image,
-                        i.name,
-                        i.amount,
-                        i.unit,
-                        i.original as "details"
-                 FROM recipes i`;
+    let query = `SELECT r.id,
+                        r.vegetarian,
+                        r.vegan,
+                        r.dairyfree,
+                        r.weightwatchersmartpoints,
+                        r.creditstext,
+                        r.title,
+                        r.readyinminutes,
+                        r.servings,
+                        r.sourceurl,
+                        r.image,
+                        r.imagetype,
+                        r.dishtype,
+                        r.diets,
+                        r.summary.
+                 FROM recipes r`;
     let whereExpressions = [];
     let queryValues = [];
 
+    // TODO: Search Filters - to be implemented
     if (whereExpressions.length > 0) {
       query += " WHERE " + whereExpressions.join(" AND ");
     }
@@ -69,12 +98,20 @@ class Recipe {
   static async get(id) {
     const recipeRes = await db.query(
       `SELECT id,
-            aisle, 
-            image, 
-            name, 
-            amount, 
-            unit, 
-            original as "details"
+                vegetarian,
+                vegan,
+                dairyfree,
+                weightwatchersmartpoints,
+                creditstext,
+                title,
+                readyinminutes,
+                servings,
+                sourceurl,
+                image,
+                imagetype as "imageType",
+                dishtype as "dishTypes",
+                diets,
+                summary
            FROM recipes
            WHERE id = $1`,
       [id]
@@ -107,12 +144,20 @@ class Recipe {
                       SET ${setCols} 
                       WHERE id = ${idVarIdx} 
                       RETURNING { id, 
-                                aisle, 
-                                image, 
-                                name, 
-                                amount, 
-                                unit, 
-                                original as "details" }`;
+                        vegetarian,
+                        vegan,
+                        dairyfree,
+                        weightwatchersmartpoints,
+                        creditstext,
+                        title,
+                        readyinminutes,
+                        servings,
+                        sourceurl,
+                        image,
+                        imagetype as "imageType",
+                        dishtype as "dishTypes",
+                        diets,
+                        summary }`;
     const result = await db.query(querySql, [...values, id]);
     const recipe = result.rows[0];
 
