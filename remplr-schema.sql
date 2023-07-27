@@ -107,8 +107,33 @@ CREATE TABLE IF NOT EXISTS meal_plan_recipes (
     ON UPDATE CASCADE
 );
 
--- meal_plan_users table
-CREATE TABLE IF NOT EXISTS meal_plan_users (
+DROP TABLE meal_plan_users;
+
+-- user_saved_ingredients table
+
+CREATE TABLE IF NOT EXISTS user_saved_ingredients (
+    id SERIAL PRIMARY KEY,
+    user_id INT,
+    ingredient_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
+    ON UPDATE CASCADE
+);
+
+-- user_saved_recipes table
+
+CREATE TABLE IF NOT EXISTS user_saved_recipes (
+    id SERIAL PRIMARY KEY,
+    user_id INT,
+    recipe_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (recipe_id) REFERENCES recipes(id)
+    ON UPDATE CASCADE
+);
+
+-- user_saved_meal_plans table
+
+CREATE TABLE IF NOT EXISTS user_saved_meal_plans (
     id SERIAL PRIMARY KEY,
     user_id INT,
     meal_plan_id INT,
@@ -116,4 +141,3 @@ CREATE TABLE IF NOT EXISTS meal_plan_users (
     FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id)
     ON UPDATE CASCADE
 );
-
