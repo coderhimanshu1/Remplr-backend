@@ -116,6 +116,54 @@ router.delete("/:username", async (req, res, next) => {
   }
 });
 
+/** GET /[username]/ingredients => { ingredients }
+ *
+ * Returns { ingredients: [{id, aisle, image, name, original, amount, unit}, ...] }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+
+router.get("/:username/ingredients", async (req, res, next) => {
+  try {
+    const ingredients = await User.getSavedIngredients(req.params.username);
+    return res.json({ ingredients });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /[username]/recipes => { recipes }
+ *
+ * Returns { recipes: [{id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext, title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary}, ...] }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+
+router.get("/:username/recipes", async (req, res, next) => {
+  try {
+    const recipes = await User.getSavedRecipes(req.params.username);
+    return res.json({ recipes });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /[username]/mealplans => { mealplans }
+ *
+ * Returns { mealplans: [{id, name, created_by}, ...] }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+
+router.get("/:username/mealplans", async (req, res, next) => {
+  try {
+    const mealplans = await User.getSavedMealPlans(req.params.username);
+    return res.json({ mealplans });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 // TODO: Add more routes for users to save recipes, ingredients and mealplans
 
 module.exports = router;

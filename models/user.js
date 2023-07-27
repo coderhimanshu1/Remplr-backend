@@ -222,6 +222,7 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
+  // Save a ingredient for a given user
   static async saveIngredient(userId, ingredientId) {
     const result = await db.query(
       `INSERT INTO user_saved_ingredients (user_id, ingredient_id)
@@ -232,6 +233,7 @@ class User {
     return result.rows[0];
   }
 
+  // Save a recipe for a given user
   static async saveRecipe(userId, recipeId) {
     const result = await db.query(
       `INSERT INTO user_saved_recipes (user_id, recipe_id)
@@ -242,6 +244,7 @@ class User {
     return result.rows[0];
   }
 
+  // Save a mealPlan for a given user
   static async saveMealPlan(userId, mealPlanId) {
     const result = await db.query(
       `INSERT INTO user_saved_meal_plans (user_id, meal_plan_id)
@@ -250,6 +253,63 @@ class User {
       [userId, mealPlanId]
     );
     return result.rows[0];
+  }
+
+  // Get saved ingredients for a given user
+  static async getSavedIngredients(username) {
+    const userRes = await db.query(`SELECT id FROM users WHERE username = $1`, [
+      username,
+    ]);
+    const userId = userRes.rows[0].id;
+
+    const ingredientsRes = await db.query(
+      `
+        SELECT i.* 
+        FROM ingredients AS i
+        JOIN user_saved_ingredients AS usi ON i.id = usi.ingredient_id
+        WHERE usi.user_id = $1`,
+      [userId]
+    );
+
+    return ingredientsRes.rows;
+  }
+
+  // Get saved recipes for a given user
+  static async getSavedRecipes(username) {
+    const userRes = await db.query(`SELECT id FROM users WHERE username = $1`, [
+      username,
+    ]);
+    const userId = userRes.rows[0].id;
+
+    const recipesRes = await db.query(
+      `
+        SELECT r.* 
+        FROM recipes AS r
+        JOIN user_saved_recipes AS usr ON r.id = usr.ingredient_id
+        WHERE usr.user_id = $1`,
+      [userId]
+    );
+
+    return recipesRes.rows;
+  }
+
+  // Get saved mealPlans for a given user
+  static async getSavedMealPlans(username) {
+    const userRes = await db.query(`SELECT id FROM users WHERE username = $1`, [
+      username,
+    ]);
+    const userId = userRes.rows[0].id;
+
+    const mealPlansRes = await db.query(
+      `
+        SELECT m.* 
+        FROM meal_plans AS m
+        JOIN user_saved_recipes AS usr ON m.id = usm.ingredient_id
+        WHERE usm.user_id = $1`,
+      [userId]
+    );
+
+    return mealPlansRes.rows;
   }
 }
 
