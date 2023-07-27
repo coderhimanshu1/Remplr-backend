@@ -221,6 +221,36 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
+
+  static async saveIngredient(userId, ingredientId) {
+    const result = await db.query(
+      `INSERT INTO user_saved_ingredients (user_id, ingredient_id)
+        VALUES ($1, $2)
+        RETURNING id`,
+      [userId, ingredientId]
+    );
+    return result.rows[0];
+  }
+
+  static async saveRecipe(userId, recipeId) {
+    const result = await db.query(
+      `INSERT INTO user_saved_recipes (user_id, recipe_id)
+        VALUES ($1, $2)
+        RETURNING id`,
+      [userId, recipeId]
+    );
+    return result.rows[0];
+  }
+
+  static async saveMealPlan(userId, mealPlanId) {
+    const result = await db.query(
+      `INSERT INTO user_saved_meal_plans (user_id, meal_plan_id)
+        VALUES ($1, $2)
+        RETURNING id`,
+      [userId, mealPlanId]
+    );
+    return result.rows[0];
+  }
 }
 
 module.exports = User;
