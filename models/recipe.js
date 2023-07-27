@@ -1,3 +1,5 @@
+// TODO: Fix this model
+
 "use strict";
 
 const db = require("../db");
