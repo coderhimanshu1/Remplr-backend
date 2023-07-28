@@ -116,11 +116,65 @@ router.delete("/:username", async (req, res, next) => {
   }
 });
 
+/** POST /[username]/ingredients/{ingredientId} => { ingredient }
+ *
+ * Associates an ingredient with a user.
+ *
+ * Returns { ingredient: { id, aisle, image, name, original, amount, unit } }
+ *
+ * TODO: Authorization required: admin or same-user-as-:username
+ **/
+router.post("/:username/ingredients/:ingredientId", async (req, res, next) => {
+  try {
+    const { username, ingredientId } = req.params;
+    const ingredient = await User.saveIngredient(username, ingredientId);
+    return res.status(201).json({ ingredient });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** POST /[username]/recipes/{recipeId} => { recipe }
+ *
+ * Associates a recipe with a user.
+ *
+ * Returns { recipe: { id, title, vegetarian, ...etc } }
+ *
+ * TODO: Authorization required: admin or same-user-as-:username
+ **/
+router.post("/:username/recipes/:recipeId", async (req, res, next) => {
+  try {
+    const { username, recipeId } = req.params;
+    const recipe = await User.saveRecipe(username, recipeId);
+    return res.status(201).json({ recipe });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** POST /[username]/mealplans/{mealPlanId} => { mealPlan }
+ *
+ * Associates a meal plan with a user.
+ *
+ * Returns { mealPlan: { id, name, created_by } }
+ *
+ * TODO: Authorization required: admin or same-user-as-:username
+ **/
+router.post("/:username/mealplans/:mealPlanId", async (req, res, next) => {
+  try {
+    const { username, mealPlanId } = req.params;
+    const mealPlan = await User.saveMealPlan(username, mealPlanId);
+    return res.status(201).json({ mealPlan });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 /** GET /[username]/ingredients => { ingredients }
  *
  * Returns { ingredients: [{id, aisle, image, name, original, amount, unit}, ...] }
  *
- * Authorization required: admin or same-user-as-:username
+ * TODO:Authorization required: admin or same-user-as-:username
  **/
 
 router.get("/:username/ingredients", async (req, res, next) => {
@@ -136,7 +190,7 @@ router.get("/:username/ingredients", async (req, res, next) => {
  *
  * Returns { recipes: [{id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext, title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary}, ...] }
  *
- * Authorization required: admin or same-user-as-:username
+ * TODO:Authorization required: admin or same-user-as-:username
  **/
 
 router.get("/:username/recipes", async (req, res, next) => {
@@ -152,7 +206,7 @@ router.get("/:username/recipes", async (req, res, next) => {
  *
  * Returns { mealplans: [{id, name, created_by}, ...] }
  *
- * Authorization required: admin or same-user-as-:username
+ * TODO:Authorization required: admin or same-user-as-:username
  **/
 
 router.get("/:username/mealplans", async (req, res, next) => {
@@ -163,7 +217,5 @@ router.get("/:username/mealplans", async (req, res, next) => {
     return next(err);
   }
 });
-
-// TODO: Add more routes for users to save recipes, ingredients and mealplans
 
 module.exports = router;
