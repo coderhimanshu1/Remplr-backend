@@ -9,13 +9,13 @@ const router = express.Router({ mergeParams: true });
 
 /** POST / { mealPlan } =>  { mealPlan }
  *
- * MealPlan should be { id, name, created_by }
+ * MealPlan should be { name, created_by, recipes : [{recipe_id, meal_type, meal_day},...] }
  *
- * Returns { id, name, created_by }
+ * Returns { id, name, created_by, recipes : [{recipe_id, meal_type, meal_day},...] }
  *
  * TODO: Authorization required
  */
-app.post("/", async function (req, res, next) {
+app.post("/", async (req, res, next) => {
   try {
     // Create the meal plan
     const mealPlan = await MealPlan.create({
@@ -42,13 +42,27 @@ app.post("/", async function (req, res, next) {
 /** GET /  =>
  *   { mealPlans: [ { id, name, created_by }, ...] }
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 
-router.get("/", async function (req, res, next) {
+router.get("/", async (req, res, next) => {
   try {
     const mealPlans = await MealPlan.findAll();
     return res.json({ mealPlans });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/** GET /:mealPlanId  =>
+ *  { id, name, created_by, recipes: [{ { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
+ *  title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary } ,meal_type, meal_day}, ...] }
+ *
+ * TODO: Authorization required: none
+ */
+router.get("/:mealPlanId", async (req, res, next) => {
+  try {
+    const mealPlan = await MealPlan.get(req.params.mealPlanId);
   } catch (err) {
     return next(err);
   }

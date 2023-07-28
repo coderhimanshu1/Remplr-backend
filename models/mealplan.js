@@ -2,6 +2,7 @@
 
 const db = require("../db");
 const { NotFoundError } = require("../expressError");
+const Recipe = require("./recipe");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 class MealPlan {
@@ -24,14 +25,14 @@ class MealPlan {
     return mealPlan;
   }
 
-  /** Add a recipe to a meal plan.
+  /** Add/link a recipe to a meal plan.
    *
    * data should be { meal_plan_id, recipe_id, meal_type, meal_day }
    *
    * Returns { id, meal_plan_id, recipe_id, meal_type, meal_day }
    **/
 
-  static async addRecipe(data) {
+  static async addRecipeToMealPlan(data) {
     const result = await db.query(
       `INSERT INTO meal_plan_recipes (meal_plan_id, recipe_id, meal_type, meal_day)
            VALUES ($1, $2, $3, $4)
@@ -83,7 +84,8 @@ class MealPlan {
 
   /** Given a meal plan id, return data about meal plan.
    *
-   * Returns { id, name, created_by }
+   * Returns { id, name, created_by, recipes: [{ { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
+   * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary } ,meal_type, meal_day}, ...] }
    *
    * Throws NotFoundError if not found.
    **/
@@ -101,6 +103,22 @@ class MealPlan {
     const mealPlan = mealPlanRes.rows[0];
 
     if (!mealPlan) throw new NotFoundError(`No meal plan: ${id}`);
+
+    const mealPlanRecipesRes = await db.query(
+      `SELECT recipe_id
+       FROM meal_plan_recipes
+       WHERE meal_plan_id = $1`,
+      [id]
+    );
+
+    const recipeIds = mealPlanRecipesRes.rows;
+
+    mealPlan.recipes = [];
+
+    for (let recipeId of recipeIds) {
+      const recipe = await Recipe.get(recipeId.recipe_id);
+      mealPlan.recipes.push(recipe);
+    }
 
     return mealPlan;
   }
