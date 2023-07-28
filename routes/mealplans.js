@@ -54,11 +54,11 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-/** GET /:mealPlanId  =>
+/** GET /[mealPlanId]  =>
  *  { id, name, created_by, recipes: [{ { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  *  title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary } ,meal_type, meal_day}, ...] }
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 router.get("/:mealPlanId", async (req, res, next) => {
   try {
@@ -67,3 +67,63 @@ router.get("/:mealPlanId", async (req, res, next) => {
     return next(err);
   }
 });
+
+/** PATCH /[mealPlanId] { mealPlan } => { mealPlan }
+ *
+ * Data can include: { name, created_by }
+ *
+ * Returns { id, name, created_by }
+ *
+ * TODO: Authorization required
+ */
+
+router.patch("/:mealPlanId", async function (req, res, next) {
+  try {
+    const mealPlan = await MealPlan.update(req.params.mealPlanId, req.body);
+    return res.json({ mealPlan });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * POST /[mealPlanId]/recipes { recipe } => { recipe }
+ *
+ * Data can include: { recipe_id, meal_type, meal_day }
+ *
+ * Returns { id, meal_plan_id, recipe_id, meal_type, meal_day }
+ *
+ * This route is used to add a new recipe to the specified meal plan.
+ *
+ * TODO: Authorization required
+ */
+
+router.post("/:mealPlanId/recipes", async function (req, res, next) {
+  try {
+    const recipe = await MealPlan.addRecipeToMealPlan({
+      meal_plan_id: req.params.mealPlanId,
+      ...req.body,
+    });
+    return res.status(201).json({ recipe });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**
+ * DELETE /[mealPlanId]/recipes/[recipeId] { recipe } => { deleted: recipeId }
+ *
+ * TODO: Authorization required
+ */
+
+router.delete(
+  "/:mealPlanId/recipes/:recipeId",
+  async function (req, res, next) {
+    try {
+      await MealPlan.removeRecipe(req.params.recipeId);
+      return res.json({ deleted: req.params.recipeId });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
