@@ -24,6 +24,47 @@ class MealPlan {
     return mealPlan;
   }
 
+  /** Add a recipe to a meal plan.
+   *
+   * data should be { meal_plan_id, recipe_id, meal_type, meal_day }
+   *
+   * Returns { id, meal_plan_id, recipe_id, meal_type, meal_day }
+   **/
+
+  static async addRecipe(data) {
+    const result = await db.query(
+      `INSERT INTO meal_plan_recipes (meal_plan_id, recipe_id, meal_type, meal_day)
+           VALUES ($1, $2, $3, $4)
+           RETURNING id, meal_plan_id, recipe_id, meal_type, meal_day`,
+      [data.meal_plan_id, data.recipe_id, data.meal_type, data.meal_day]
+    );
+
+    return result.rows[0];
+  }
+
+  /** Remove a recipe from a meal plan.
+   *
+   * Returns { id, meal_plan_id, recipe_id, meal_type, meal_day }
+   *
+   * Throws NotFoundError if not found.
+   **/
+  static async removeRecipe(id) {
+    const result = await db.query(
+      `DELETE
+           FROM meal_plan_recipes
+           WHERE id = $1
+           RETURNING id, meal_plan_id, recipe_id, meal_type, meal_day`,
+      [id]
+    );
+
+    const mealPlanRecipe = result.rows[0];
+
+    if (!mealPlanRecipe)
+      throw new NotFoundError(`No recipe in meal plan: ${id}`);
+
+    return mealPlanRecipe;
+  }
+
   /** Find all meal plans
    *
    * Returns [{ id, name, created_by }, ...]

@@ -304,7 +304,7 @@ class User {
       `
         SELECT m.* 
         FROM meal_plans AS m
-        JOIN user_saved_recipes AS usr ON m.id = usm.ingredient_id
+        JOIN user_saved_meal_plans AS usm ON m.id = usm.recipe_id
         WHERE usm.user_id = $1`,
       [userId]
     );
