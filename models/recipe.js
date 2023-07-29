@@ -124,6 +124,49 @@ class Recipe {
     return recipe;
   }
 
+  /** Given a recipe id, return data about ingredients.
+   *
+   * Returns [{ id, recipe_id, ingredient_id, amount, unit }, ...]
+   *
+   * Throws NotFoundError if not found.
+   **/
+  static async getIngredients(id) {
+    const ingredientsRes = await db.query(
+      `SELECT id, recipe_id as "recipeId", ingredient_id as "ingredientId", amount, unit 
+           FROM recipe_ingredients
+           WHERE recipe_id = $1`,
+      [id]
+    );
+
+    const ingredients = ingredientsRes.rows;
+
+    if (!ingredients)
+      throw new NotFoundError(`No ingredients for recipe: ${id}`);
+
+    return ingredients;
+  }
+
+  /** Given a recipe id, return data about nutrients.
+   *
+   * Returns [{ id, recipe_id, nutrient_id, amount, unit }, ...]
+   *
+   * Throws NotFoundError if not found.
+   **/
+  static async getNutrients(id) {
+    const nutrientsRes = await db.query(
+      `SELECT id, recipe_id as "recipeId", nutrient_id as "nutrientId", amount, unit 
+           FROM recipe_nutrients
+           WHERE recipe_id = $1`,
+      [id]
+    );
+
+    const nutrients = nutrientsRes.rows;
+
+    if (!nutrients) throw new NotFoundError(`No nutrients for recipe: ${id}`);
+
+    return nutrients;
+  }
+
   /** Update recipe data with `data`.
    *
    * This is a "partial update" --- it's fine if data doesn't contain

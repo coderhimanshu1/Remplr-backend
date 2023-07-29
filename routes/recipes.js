@@ -14,7 +14,7 @@ const recipeUpdateSchema = require("../schemas/recipeUpdate.json");
  * Returns { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary }
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 
 router.post("/", async function (req, res, next) {
@@ -39,7 +39,7 @@ router.post("/", async function (req, res, next) {
  * Can filter on provided search filters:
  * - TODO: add filter parameters
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 
 router.get("/", async function (req, res, next) {
@@ -54,14 +54,18 @@ router.get("/", async function (req, res, next) {
 /** GET /[id]  => { recipe }
  *
  *  Recipe is { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
- * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary }
+ * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary, ingredients, nutrients }
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 
 router.get("/:id", async function (req, res, next) {
   try {
     const recipe = await Recipe.get(req.params.id);
+    const ingredients = await Recipe.getIngredients(req.params.id);
+    const nutrients = await Recipe.getNutrients(req.params.id);
+    recipe.ingredients = ingredients;
+    recipe.nutrients = nutrients;
     return res.json({ recipe });
   } catch (err) {
     return next(err);
@@ -76,7 +80,7 @@ router.get("/:id", async function (req, res, next) {
  * Returns { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary }
  *
- * TODO: Authorization required: none
+ * TODO: Authorization required
  */
 
 router.patch("/:id", async function (req, res, next) {
@@ -96,7 +100,7 @@ router.patch("/:id", async function (req, res, next) {
 
 /** DELETE /[id]  =>  { deleted: id }
  *
- * TODO: Authorization: none
+ * TODO: Authorization
  */
 
 router.delete("/:id", async function (req, res, next) {
