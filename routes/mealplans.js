@@ -15,7 +15,7 @@ const router = express.Router({ mergeParams: true });
  *
  * TODO: Authorization required
  */
-app.post("/", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     // Create the meal plan
     const mealPlan = await MealPlan.create({
@@ -127,3 +127,5 @@ router.delete(
     }
   }
 );
+
+module.exports = router;

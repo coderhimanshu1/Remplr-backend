@@ -23,7 +23,7 @@ router.post("/", async function (req, res, next) {
       throw new BadRequestError(errs);
     }
 
-    const ingredient = await ingredient.create(req.body);
+    const ingredient = await Ingredient.create(req.body);
     return res.status(201).json({ ingredient });
   } catch (err) {
     return next(err);
@@ -41,7 +41,7 @@ router.post("/", async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   try {
-    const ingredients = await ingredient.findAll(req.query);
+    const ingredients = await Ingredient.findAll(req.query);
     return res.json({ ingredients });
   } catch (err) {
     return next(err);
@@ -57,7 +57,7 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:id", async function (req, res, next) {
   try {
-    const ingredient = await ingredient.get(req.params.id);
+    const ingredient = await Ingredient.get(req.params.id);
     return res.json({ ingredient });
   } catch (err) {
     return next(err);
@@ -81,7 +81,7 @@ router.patch("/:id", async function (req, res, next) {
       throw new BadRequestError(errs);
     }
 
-    const ingredient = await ingredient.update(req.params.id, req.body);
+    const ingredient = await Ingredient.update(req.params.id, req.body);
     return res.json({ ingredient });
   } catch (err) {
     return next(err);
@@ -95,7 +95,7 @@ router.patch("/:id", async function (req, res, next) {
 
 router.delete("/:id", async function (req, res, next) {
   try {
-    await ingredient.remove(req.params.id);
+    await Ingredient.remove(req.params.id);
     return res.json({ deleted: req.params.id });
   } catch (err) {
     return next(err);

@@ -71,7 +71,7 @@ class Recipe {
                         r.imagetype,
                         r.dishtype,
                         r.diets,
-                        r.summary.
+                        r.summary
                  FROM recipes r`;
     let whereExpressions = [];
     let queryValues = [];

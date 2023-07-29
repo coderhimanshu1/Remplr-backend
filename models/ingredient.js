@@ -52,7 +52,7 @@ class Ingredient {
 
     // Finalize query and return results
 
-    query += " ORDER BY title";
+    query += " ORDER BY name";
     const ingredientsRes = await db.query(query, queryValues);
     return ingredientsRes.rows;
   }

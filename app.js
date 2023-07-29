@@ -12,7 +12,7 @@ const authRoutes = require("./routes/auth");
 const usersRoutes = require("./routes/users");
 const ingredientsRoutes = require("./routes/ingredients");
 const recipesRoutes = require("./routes/recipes");
-const mealplansRoutes = require("./routes/mealPlans");
+const mealPlansRoutes = require("./routes/mealPlans");
 
 const morgan = require("morgan");
 
@@ -27,7 +27,7 @@ app.use("/auth", authRoutes);
 app.use("/users", usersRoutes);
 app.use("/ingredients", ingredientsRoutes);
 app.use("/recipes", recipesRoutes);
-app.use("/mealplans", mealplansRoutes);
+app.use("/mealplans", mealPlansRoutes);
 
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
