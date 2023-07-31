@@ -63,6 +63,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:mealPlanId", async (req, res, next) => {
   try {
     const mealPlan = await MealPlan.get(req.params.mealPlanId);
+    return res.json({ mealPlan });
   } catch (err) {
     return next(err);
   }

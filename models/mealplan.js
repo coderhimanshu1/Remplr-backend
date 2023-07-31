@@ -103,10 +103,10 @@ class MealPlan {
   static async get(id) {
     const mealPlanRes = await db.query(
       `SELECT id,
-              name,
-              created_by
-           FROM meal_plans
-           WHERE id = $1`,
+            name,
+            created_by
+         FROM meal_plans
+         WHERE id = $1`,
       [id]
     );
 
@@ -115,20 +115,31 @@ class MealPlan {
     if (!mealPlan) throw new NotFoundError(`No meal plan: ${id}`);
 
     const mealPlanRecipesRes = await db.query(
-      `SELECT recipe_id
-       FROM meal_plan_recipes
-       WHERE meal_plan_id = $1`,
+      `SELECT mpr.recipe_id,
+            mpr.meal_type,
+            mpr.meal_day,
+            r.id AS recipe_id,
+            r.vegetarian,
+            r.vegan,
+            r.dairyfree,
+            r.weightwatchersmartpoints,
+            r.creditstext,
+            r.title,
+            r.readyinminutes,
+            r.servings,
+            r.sourceurl,
+            r.image,
+            r.imagetype,
+            r.dishtype,
+            r.diets,
+            r.summary
+     FROM meal_plan_recipes AS mpr
+     JOIN recipes AS r ON mpr.recipe_id = r.id
+     WHERE mpr.meal_plan_id = $1`,
       [id]
     );
 
-    const recipeIds = mealPlanRecipesRes.rows;
-
-    mealPlan.recipes = [];
-
-    for (let recipeId of recipeIds) {
-      const recipe = await Recipe.get(recipeId.recipe_id);
-      mealPlan.recipes.push(recipe);
-    }
+    mealPlan.recipes = mealPlanRecipesRes.rows;
 
     return mealPlan;
   }
