@@ -63,7 +63,7 @@ class MealPlan {
     const result = await db.query(
       `DELETE
            FROM meal_plan_recipes
-           WHERE id = $1
+           WHERE recipe_id = $1
            RETURNING id, meal_plan_id, recipe_id, meal_type, meal_day`,
       [id]
     );
@@ -71,7 +71,7 @@ class MealPlan {
     const mealPlanRecipe = result.rows[0];
 
     if (!mealPlanRecipe)
-      throw new NotFoundError(`No recipe in meal plan: ${id}`);
+      throw new NotFoundError(`No recipe in meal plan with id: ${id}`);
 
     return mealPlanRecipe;
   }
@@ -178,16 +178,24 @@ class MealPlan {
    **/
 
   static async remove(id) {
-    const result = await db.query(
-      `DELETE
-           FROM meal_plans
-           WHERE id = $1
-           RETURNING id`,
-      [id]
-    );
-    const mealPlan = result.rows[0];
+    try {
+      // First, delete associated data from meal_plan_recipes table
+      await db.query(`DELETE FROM meal_plan_recipes WHERE meal_plan_id = $1`, [
+        id,
+      ]);
 
-    if (!mealPlan) throw new NotFoundError(`No meal plan: ${id}`);
+      // Then, delete the meal plan from meal_plans table
+      const result = await db.query(
+        `DELETE FROM meal_plans WHERE id = $1 RETURNING id`,
+        [id]
+      );
+
+      const mealPlan = result.rows[0];
+
+      if (!mealPlan) throw new NotFoundError(`No meal plan: ${id}`);
+    } catch (err) {
+      throw err;
+    }
   }
 }
 

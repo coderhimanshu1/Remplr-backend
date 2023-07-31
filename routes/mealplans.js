@@ -114,6 +114,8 @@ router.post("/:mealPlanId/recipes", async function (req, res, next) {
 /**
  * DELETE /[mealPlanId]/recipes/[recipeId] { recipe } => { deleted: recipeId }
  *
+ * This route is used to remove a recipe from the specified meal plan.
+ *
  * TODO: Authorization required
  */
 
@@ -122,11 +124,28 @@ router.delete(
   async function (req, res, next) {
     try {
       await MealPlan.removeRecipe(req.params.recipeId);
-      return res.json({ deleted: req.params.recipeId });
+      return res.json({ "deleted recipe": req.params.recipeId });
     } catch (err) {
       return next(err);
     }
   }
 );
+
+/**
+ * DELETE /[mealPlanId] { recipe } => { deleted: mealPlanId }
+ *
+ * This route is used to delete the specified meal plan.
+ *
+ * TODO: Authorization required
+ */
+
+router.delete("/:mealPlanId", async function (req, res, next) {
+  try {
+    await MealPlan.remove(req.params.mealPlanId);
+    return res.json({ "deleted meal plan": req.params.mealPlanId });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;
