@@ -23,11 +23,13 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(255),
     first_name VARCHAR(255),
     last_name VARCHAR(255),
+    password VARCHAR(255),
     email VARCHAR(255),
     is_admin BOOLEAN,
     is_client BOOLEAN,
     is_nutritionist BOOLEAN
 );
+
 
 -- ingredients table
 CREATE TABLE IF NOT EXISTS ingredients (

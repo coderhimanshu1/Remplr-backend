@@ -9,7 +9,7 @@ const express = require("express");
 const router = new express.Router();
 const { createToken } = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
-const userRegisterSchema = require("../schemas/userRegister.json");
+const userNewSchema = require("../schemas/userNew.json");
 const { BadRequestError } = require("../expressError");
 
 /** POST /auth/token:  { username, password } => { token }
@@ -47,7 +47,7 @@ router.post("/token", async function (req, res, next) {
 
 router.post("/register", async function (req, res, next) {
   try {
-    const validator = jsonschema.validate(req.body, userRegisterSchema);
+    const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
