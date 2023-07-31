@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("../db");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, BadRequestError } = require("../expressError");
 const Recipe = require("./recipe");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
@@ -14,14 +14,24 @@ class MealPlan {
    **/
 
   static async create(data) {
+    // Check if a meal plan with the same name already exists
+    const duplicateCheck = await db.query(
+      `SELECT * FROM meal_plans WHERE name = $1`,
+      [data.name]
+    );
+
+    if (duplicateCheck.rows.length > 0)
+      throw new BadRequestError(`Duplicate mealPlan: ${data.name}`);
+
+    // Create the meal plan
     const result = await db.query(
       `INSERT INTO meal_plans (name, created_by)
            VALUES ($1, $2)
            RETURNING id, name, created_by`,
       [data.name, data.created_by]
     );
-    let mealPlan = result.rows[0];
 
+    let mealPlan = result.rows[0];
     return mealPlan;
   }
 

@@ -25,12 +25,12 @@ router.post("/", async (req, res, next) => {
 
     // Add each recipe to the meal plan
     for (let recipe of req.body.recipes) {
-      await MealPlan.addRecipeToMealPlan(
-        mealPlan.id,
-        recipe.recipe_id,
-        recipe.meal_type,
-        recipe.meal_day
-      );
+      await MealPlan.addRecipeToMealPlan({
+        meal_plan_id: mealPlan.id,
+        recipe_id: recipe.recipe_id,
+        meal_type: recipe.meal_type,
+        meal_day: recipe.meal_day,
+      });
     }
 
     return res.status(201).json({ mealPlan });

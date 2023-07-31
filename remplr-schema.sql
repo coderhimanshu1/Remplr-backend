@@ -101,13 +101,11 @@ CREATE TABLE IF NOT EXISTS meal_plan_recipes (
     meal_plan_id INT,
     recipe_id INT,
     meal_type VARCHAR(255),
-    meal_day INT,
+    meal_day VARCHAR(20),
     FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id),
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
     ON UPDATE CASCADE
 );
-
-DROP TABLE meal_plan_users;
 
 -- user_saved_ingredients table
 
