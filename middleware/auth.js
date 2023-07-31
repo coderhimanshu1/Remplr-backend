@@ -78,7 +78,7 @@ function ensureCorrectUserOrAdmin(req, res, next) {
  * If not, raises Unauthorized.
  */
 
-function ensureIsNutritionist(req, res, next) {
+function ensureNutritionist(req, res, next) {
   try {
     const user = res.locals.user;
     if (!(user && user.isNutritionist)) {
@@ -95,7 +95,7 @@ function ensureIsNutritionist(req, res, next) {
  * If not, raises Unauthorized.
  */
 
-function ensureIsClient(req, res, next) {
+function ensureClient(req, res, next) {
   try {
     const user = res.locals.user;
     if (!(user && user.isClient)) {
@@ -112,6 +112,6 @@ module.exports = {
   ensureLoggedIn,
   ensureAdmin,
   ensureCorrectUserOrAdmin,
-  ensureIsNutritionist,
-  ensureIsClient,
+  ensureNutritionist,
+  ensureClient,
 };

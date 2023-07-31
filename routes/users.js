@@ -5,7 +5,12 @@
 const jsonschema = require("jsonschema");
 
 const express = require("express");
-const { ensureCorrectUserOrAdmin, ensureAdmin } = require("../middleware/auth");
+const {
+  ensureCorrectUserOrAdmin,
+  ensureAdmin,
+  ensureNutritionist,
+  ensureClient,
+} = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -23,10 +28,10 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * TODO:Authorization required: admin
+ * Authorization required: admin
  **/
 
-router.post("/", async (req, res, next) => {
+router.post("/", ensureAdmin, async (req, res, next) => {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
@@ -46,10 +51,10 @@ router.post("/", async (req, res, next) => {
  *
  * Returns list of all users.
  *
- * TODO:Authorization required: admin
+ * Authorization required: admin
  **/
 
-router.get("/", async (req, res, next) => {
+router.get("/", ensureAdmin, async (req, res, next) => {
   try {
     const users = await User.findAll();
     return res.json({ users });
@@ -65,10 +70,10 @@ router.get("/", async (req, res, next) => {
  *   where ingredients is [id(s)]
  *   where mealplans is [id(s)]
  *
- * TODO:Authorization required: admin or same user-as-:username
+ * Authorization required: admin or same user-as-:username
  **/
 
-router.get("/:username", async (req, res, next) => {
+router.get("/:username", ensureCorrectUserOrAdmin, async (req, res, next) => {
   try {
     const user = await User.get(req.params.username);
     return res.json({ user });
@@ -84,10 +89,10 @@ router.get("/:username", async (req, res, next) => {
  *
  * Returns { username, firstName, lastName, email, isAdmin, isNutritionist, isClient }
  *
- * TODO:Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
 
-router.patch("/:username", async (req, res, next) => {
+router.patch("/:username", ensureCorrectUserOrAdmin, async (req, res, next) => {
   try {
     const validator = jsonschema.validate(req.body, userUpdateSchema);
     if (!validator.valid) {
@@ -104,17 +109,21 @@ router.patch("/:username", async (req, res, next) => {
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * TODO:Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
 
-router.delete("/:username", async (req, res, next) => {
-  try {
-    await User.remove(req.params.username);
-    return res.json({ deleted: req.params.username });
-  } catch (err) {
-    return next(err);
+router.delete(
+  "/:username",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      await User.remove(req.params.username);
+      return res.json({ deleted: req.params.username });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** POST /[username]/ingredients/{ingredientId} => { ingredient }
  *
@@ -122,17 +131,21 @@ router.delete("/:username", async (req, res, next) => {
  *
  * Returns { ingredient: { id, aisle, image, name, original, amount, unit } }
  *
- * TODO: Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
-router.post("/:username/ingredients/:ingredientId", async (req, res, next) => {
-  try {
-    const { username, ingredientId } = req.params;
-    const ingredient = await User.saveIngredient(username, ingredientId);
-    return res.status(201).json({ ingredient });
-  } catch (err) {
-    return next(err);
+router.post(
+  "/:username/ingredients/:ingredientId",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const { username, ingredientId } = req.params;
+      const ingredient = await User.saveIngredient(username, ingredientId);
+      return res.status(201).json({ ingredient });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** POST /[username]/recipes/{recipeId} => { recipe }
  *
@@ -140,17 +153,21 @@ router.post("/:username/ingredients/:ingredientId", async (req, res, next) => {
  *
  * Returns { recipe: { id, title, vegetarian, ...etc } }
  *
- * TODO: Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
-router.post("/:username/recipes/:recipeId", async (req, res, next) => {
-  try {
-    const { username, recipeId } = req.params;
-    const recipe = await User.saveRecipe(username, recipeId);
-    return res.status(201).json({ recipe });
-  } catch (err) {
-    return next(err);
+router.post(
+  "/:username/recipes/:recipeId",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const { username, recipeId } = req.params;
+      const recipe = await User.saveRecipe(username, recipeId);
+      return res.status(201).json({ recipe });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** POST /[username]/mealplans/{mealPlanId} => { mealPlan }
  *
@@ -158,64 +175,85 @@ router.post("/:username/recipes/:recipeId", async (req, res, next) => {
  *
  * Returns { mealPlan: { id, name, created_by } }
  *
- * TODO: Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or nutritionist
  **/
-router.post("/:username/mealplans/:mealPlanId", async (req, res, next) => {
-  try {
-    const { username, mealPlanId } = req.params;
-    const mealPlan = await User.saveMealPlan(username, mealPlanId);
-    return res.status(201).json({ mealPlan });
-  } catch (err) {
-    return next(err);
+router.post(
+  "/:username/mealplans/:mealPlanId",
+  ensureAdmin,
+  ensureNutritionist,
+  async (req, res, next) => {
+    try {
+      const { username, mealPlanId } = req.params;
+      const mealPlan = await User.saveMealPlan(username, mealPlanId);
+      return res.status(201).json({ mealPlan });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** GET /[username]/ingredients => { ingredients }
  *
+ * Get user saved ingredients
+ *
  * Returns { ingredients: [{id, aisle, image, name, original, amount, unit}, ...] }
  *
- * TODO:Authorization required: admin or same-user-as-:username
+ * Authorization required:  admin or same-user-as-:username
  **/
 
-router.get("/:username/ingredients", async (req, res, next) => {
-  try {
-    const ingredients = await User.getSavedIngredients(req.params.username);
-    return res.json({ ingredients });
-  } catch (err) {
-    return next(err);
+router.get(
+  "/:username/ingredients",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const ingredients = await User.getSavedIngredients(req.params.username);
+      return res.json({ ingredients });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** GET /[username]/recipes => { recipes }
  *
+ * Get user saved recipes
+ *
  * Returns { recipes: [{id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext, title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary}, ...] }
  *
- * TODO:Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
 
-router.get("/:username/recipes", async (req, res, next) => {
-  try {
-    const recipes = await User.getSavedRecipes(req.params.username);
-    return res.json({ recipes });
-  } catch (err) {
-    return next(err);
+router.get(
+  "/:username/recipes",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const recipes = await User.getSavedRecipes(req.params.username);
+      return res.json({ recipes });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** GET /[username]/mealplans => { mealplans }
  *
  * Returns { mealplans: [{id, name, created_by}, ...] }
  *
- * TODO:Authorization required: admin or same-user-as-:username
+ * Authorization required: admin or same-user-as-:username
  **/
 
-router.get("/:username/mealplans", async (req, res, next) => {
-  try {
-    const mealplans = await User.getSavedMealPlans(req.params.username);
-    return res.json({ mealplans });
-  } catch (err) {
-    return next(err);
+router.get(
+  "/:username/mealplans",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const mealplans = await User.getSavedMealPlans(req.params.username);
+      return res.json({ mealplans });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 module.exports = router;
