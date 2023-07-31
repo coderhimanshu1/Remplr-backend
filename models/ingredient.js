@@ -59,30 +59,44 @@ class Ingredient {
 
   /** Given a ingredient id, return data about ingredient.
    *
-   * Returns { id, aisle, image, name, amount, unit, details }
+   * Returns { id, aisle, image, name, amount, unit, details, nutrients:
+   * { name, amount, unit, percentOfDailyNeeds} }
    *
    * Throws NotFoundError if not found.
    **/
 
   static async get(id) {
     const ingredientRes = await db.query(
-      `SELECT id,
-            aisle, 
-            image, 
-            name, 
-            amount, 
-            unit, 
-            original as "details"
-           FROM ingredients
-           WHERE id = $1`,
+      `SELECT i.id,
+              i.aisle, 
+              i.image, 
+              i.name, 
+              i.amount, 
+              i.unit, 
+              i.original as "details",
+              inut.name AS "nutrientName",
+              inut.amount AS "nutrientAmount",
+              inut.unit AS "nutrientUnit",
+              inut.percentofdailyneeds AS "percentOfDailyNeeds"
+            FROM ingredients i
+            LEFT JOIN ingredient_nutrients inut ON i.id = inut.ingredient_id
+            WHERE i.id = $1`,
       [id]
     );
 
-    const ingredient = ingredientRes.rows[0];
+    const rows = ingredientRes.rows;
+    if (rows.length === 0) throw new NotFoundError(`No ingredient: ${id}`);
 
-    if (!ingredient) throw new NotFoundError(`No ingredient: ${id}`);
+    // Group nutrient information for the ingredient
+    const { id, aisle, image, name, amount, unit, details } = rows[0];
+    const nutrients = rows.map((row) => ({
+      name: row.nutrientName,
+      amount: row.nutrientAmount,
+      unit: row.nutrientUnit,
+      percentOfDailyNeeds: row.percentOfDailyNeeds,
+    }));
 
-    return ingredient;
+    return { id, aisle, image, name, amount, unit, details, nutrients };
   }
 
   /** Update ingredient data with `data`.
