@@ -36,7 +36,9 @@ router.post("/token", async function (req, res, next) {
   }
 });
 
-/** POST /auth/register:   { user } => { token }
+/**Client Registeration
+ *
+ * POST /auth/register/client:   { user } => { token }
  *
  * user must include { username, password, firstName, lastName, email }
  *
@@ -45,7 +47,7 @@ router.post("/token", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.post("/register", async function (req, res, next) {
+router.post("/register/client", async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
@@ -53,7 +55,44 @@ router.post("/register", async function (req, res, next) {
       throw new BadRequestError(errs);
     }
 
-    const newUser = await User.register({ ...req.body, isAdmin: false });
+    const newUser = await User.register({
+      ...req.body,
+      isAdmin: false,
+      isClient: true,
+      isNutritionist: false,
+    });
+    const token = createToken(newUser);
+    return res.status(201).json({ token });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+/**Nutritionist Registeration
+ *
+ * POST /auth/register/client:   { user } => { token }
+ *
+ * user must include { username, password, firstName, lastName, email }
+ *
+ * Returns JWT token which can be used to authenticate further requests.
+ *
+ * Authorization required: none
+ */
+
+router.post("/register/nutritionist", async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, userNewSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
+    }
+
+    const newUser = await User.register({
+      ...req.body,
+      isAdmin: false,
+      isNutritionist: true,
+      isClient: false,
+    });
     const token = createToken(newUser);
     return res.status(201).json({ token });
   } catch (err) {
