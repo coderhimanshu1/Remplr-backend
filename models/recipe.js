@@ -132,9 +132,10 @@ class Recipe {
    **/
   static async getIngredients(id) {
     const ingredientsRes = await db.query(
-      `SELECT id, recipe_id as "recipeId", ingredient_id as "ingredientId", amount, unit 
-           FROM recipe_ingredients
-           WHERE recipe_id = $1`,
+      `SELECT i.id, i.aisle, i.image, i.name, i.original, i.amount, i.unit
+      FROM recipe_ingredients ri
+      JOIN ingredients i ON ri.ingredient_id = i.id
+      WHERE ri.recipe_id = $1`,
       [id]
     );
 
@@ -152,9 +153,9 @@ class Recipe {
    *
    * Throws NotFoundError if not found.
    **/
-  static async getNutrients(id) {
+  static async getRecipeNutrients(id) {
     const nutrientsRes = await db.query(
-      `SELECT id, recipe_id as "recipeId", nutrient_id as "nutrientId", amount, unit 
+      `SELECT id,name, amount, unit, percentofdailyneeds
            FROM recipe_nutrients
            WHERE recipe_id = $1`,
       [id]

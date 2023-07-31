@@ -88,7 +88,7 @@ class Ingredient {
     if (rows.length === 0) throw new NotFoundError(`No ingredient: ${id}`);
 
     // Group nutrient information for the ingredient
-    const { id, aisle, image, name, amount, unit, details } = rows[0];
+    const { aisle, image, name, amount, unit, details } = rows[0];
     const nutrients = rows.map((row) => ({
       name: row.nutrientName,
       amount: row.nutrientAmount,

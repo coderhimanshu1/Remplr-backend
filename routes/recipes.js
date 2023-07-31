@@ -63,7 +63,7 @@ router.get("/:id", async function (req, res, next) {
   try {
     const recipe = await Recipe.get(req.params.id);
     const ingredients = await Recipe.getIngredients(req.params.id);
-    const nutrients = await Recipe.getNutrients(req.params.id);
+    const nutrients = await Recipe.getRecipeNutrients(req.params.id);
     recipe.ingredients = ingredients;
     recipe.nutrients = nutrients;
     return res.json({ recipe });
