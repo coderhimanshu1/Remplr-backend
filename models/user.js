@@ -142,7 +142,7 @@ class User {
 
   static async get(username) {
     const userRes = await db.query(
-      `SELECT username,
+      `SELECT id, username,
                   first_name AS "firstName",
                   last_name AS "lastName",
                   email,
@@ -224,29 +224,79 @@ class User {
   }
 
   // Save a ingredient for a given user
-  static async saveIngredient(userId, ingredientId) {
-    const result = await db.query(
-      `INSERT INTO user_saved_ingredients (user_id, ingredient_id)
-        VALUES ($1, $2)
-        RETURNING id`,
-      [userId, ingredientId]
-    );
-    return result.rows[0];
+  static async saveIngredient(username, ingredientId) {
+    try {
+      // First, retrieve the userId based on the username
+      const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
+        username,
+      ]);
+      const userId = user.rows[0].id;
+
+      // check if Ingredient is already saved
+      const duplicateCheck = await db.query(
+        `SELECT * FROM user_saved_ingredients
+            WHERE user_id = $1 AND ingredient_id = $2`,
+        [userId, ingredientId]
+      );
+
+      if (duplicateCheck.rows.length > 0)
+        throw new BadRequestError(`Ingredient already saved`);
+
+      // Then, insert the ingredient using the retrieved userId
+      const result = await db.query(
+        `INSERT INTO user_saved_ingredients (user_id, ingredient_id)
+          VALUES ($1, $2)
+          RETURNING id`,
+        [userId, ingredientId]
+      );
+      return result.rows[0];
+    } catch (err) {
+      // Handle any errors that might occur during the database queries
+      throw err;
+    }
   }
 
   // Save a recipe for a given user
-  static async saveRecipe(userId, recipeId) {
-    const result = await db.query(
-      `INSERT INTO user_saved_recipes (user_id, recipe_id)
-        VALUES ($1, $2)
-        RETURNING id`,
-      [userId, recipeId]
-    );
-    return result.rows[0];
+  static async saveRecipe(username, recipeId) {
+    try {
+      // First, retrieve the userId based on the username
+      const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
+        username,
+      ]);
+      const userId = user.rows[0].id;
+
+      // check if Ingredient is already saved
+      const duplicateCheck = await db.query(
+        `SELECT * FROM user_saved_recipes
+            WHERE user_id = $1 AND recipe_id = $2`,
+        [userId, recipeId]
+      );
+
+      if (duplicateCheck.rows.length > 0)
+        throw new BadRequestError(`Recipe already saved`);
+
+      // Then, insert the ingredient using the retrieved userId
+      const result = await db.query(
+        `INSERT INTO user_saved_recipes (user_id, recipe_id)
+          VALUES ($1, $2)
+          RETURNING id`,
+        [userId, recipeId]
+      );
+      return result.rows[0];
+    } catch (err) {
+      // Handle any errors that might occur during the database queries
+      throw err;
+    }
   }
 
   // Save a mealPlan for a given user
-  static async saveMealPlan(userId, mealPlanId) {
+  static async saveMealPlan(username, mealPlanId) {
+    // First, retrieve the userId based on the username
+    const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
+      username,
+    ]);
+    const userId = user.rows[0].id;
+
     const result = await db.query(
       `INSERT INTO user_saved_meal_plans (user_id, meal_plan_id)
         VALUES ($1, $2)

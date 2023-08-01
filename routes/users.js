@@ -118,7 +118,7 @@ router.delete(
   async (req, res, next) => {
     try {
       await User.remove(req.params.username);
-      return res.json({ deleted: req.params.username });
+      return res.json({ "deleted user": req.params.username });
     } catch (err) {
       return next(err);
     }
@@ -140,7 +140,7 @@ router.post(
     try {
       const { username, ingredientId } = req.params;
       const ingredient = await User.saveIngredient(username, ingredientId);
-      return res.status(201).json({ ingredient });
+      return res.status(201).json({ "Saved ingredient with id": ingredientId });
     } catch (err) {
       return next(err);
     }
@@ -179,8 +179,7 @@ router.post(
  **/
 router.post(
   "/:username/mealplans/:mealPlanId",
-  ensureAdmin,
-  ensureNutritionist,
+  ensureAdmin || ensureNutritionist,
   async (req, res, next) => {
     try {
       const { username, mealPlanId } = req.params;
@@ -207,7 +206,7 @@ router.get(
   async (req, res, next) => {
     try {
       const ingredients = await User.getSavedIngredients(req.params.username);
-      return res.json({ ingredients });
+      return res.json(ingredients);
     } catch (err) {
       return next(err);
     }
