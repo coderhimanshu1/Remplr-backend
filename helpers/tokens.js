@@ -14,10 +14,11 @@ function createToken(user) {
   let payload = {
     username: user.username,
     isAdmin: user.isAdmin || false,
-    isAdmin: user.isNutritionist || false,
-    isAdmin: user.isClient || false,
+    isNutritionist: user.isNutritionist || false,
+    isClient: user.isClient || false,
   };
 
+  console.log("payload>>>>>", payload);
   return jwt.sign(payload, SECRET_KEY);
 }
 
