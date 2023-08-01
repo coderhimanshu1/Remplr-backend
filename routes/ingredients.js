@@ -3,6 +3,12 @@ const Ingredient = require("../models/ingredient");
 const router = new express.Router();
 const { BadRequestError } = require("../expressError");
 const jsonschema = require("jsonschema");
+const {
+  ensureCorrectUserOrAdmin,
+  ensureAdmin,
+  ensureNutritionist,
+  ensureClient,
+} = require("../middleware/auth");
 const ingredientNewSchema = require("../schemas/ingredientNew.json");
 const ingredientUpdateSchema = require("../schemas/ingredientUpdate.json");
 
@@ -12,23 +18,27 @@ const ingredientUpdateSchema = require("../schemas/ingredientUpdate.json");
  *
  * Returns {id, aisle, image, name, amount, unit, details }
  *
- * TODO: Authorization required
+ * Authorization required: admin or nutritionist
  */
 
-router.post("/", async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, ingredientNewSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map((e) => e.stack);
-      throw new BadRequestError(errs);
-    }
+router.post(
+  "/",
+  ensureAdmin || ensureNutritionist,
+  async function (req, res, next) {
+    try {
+      const validator = jsonschema.validate(req.body, ingredientNewSchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
 
-    const ingredient = await Ingredient.create(req.body);
-    return res.status(201).json({ ingredient });
-  } catch (err) {
-    return next(err);
+      const ingredient = await Ingredient.create(req.body);
+      return res.status(201).json({ ingredient });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /** GET /  =>
  *   { ingredients: [{id, aisle, image, name, amount, unit, details },...] }
@@ -36,10 +46,10 @@ router.post("/", async function (req, res, next) {
  * Can filter on provided search filters:
  * - TODO: add filter parameters
  *
- * TODO: Authorization required
+ * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/", async function (req, res, next) {
+router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const ingredients = await Ingredient.findAll(req.query);
     return res.json({ ingredients });
@@ -52,10 +62,10 @@ router.get("/", async function (req, res, next) {
  *
  *  ingredient is { id, aisle, image, name, amount, unit, details }
  *
- * TODO: Authorization required
+ * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const ingredient = await Ingredient.get(req.params.id);
     return res.json({ ingredient });
@@ -70,10 +80,10 @@ router.get("/:id", async function (req, res, next) {
  *
  * Returns { id, aisle, image, name, amount, unit, details }
  *
- * TODO: Authorization required
+ * Authorization required: admin
  */
 
-router.patch("/:id", async function (req, res, next) {
+router.patch("/:id", ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, ingredientUpdateSchema);
     if (!validator.valid) {
@@ -90,10 +100,10 @@ router.patch("/:id", async function (req, res, next) {
 
 /** DELETE /[id]  =>  { deleted: id }
  *
- * TODO: Authorization: none
+ * Authorization: admin
  */
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
   try {
     await Ingredient.remove(req.params.id);
     return res.json({ deleted: req.params.id });
