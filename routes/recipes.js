@@ -3,6 +3,13 @@ const Recipe = require("../models/recipe");
 const router = new express.Router();
 const { BadRequestError } = require("../expressError");
 const jsonschema = require("jsonschema");
+const {
+  ensureCorrectUserOrAdmin,
+  ensureAdminOrNutritionist,
+  ensureAdmin,
+  ensureNutritionist,
+  ensureClient,
+} = require("../middleware/auth");
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeUpdateSchema = require("../schemas/recipeUpdate.json");
 
@@ -14,10 +21,10 @@ const recipeUpdateSchema = require("../schemas/recipeUpdate.json");
  * Returns { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary }
  *
- * TODO: Authorization required
+ *  Authorization required: admin or nutritionist
  */
 
-router.post("/", async function (req, res, next) {
+router.post("/", ensureAdminOrNutritionist, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, recipeNewSchema);
     if (!validator.valid) {
@@ -39,10 +46,10 @@ router.post("/", async function (req, res, next) {
  * Can filter on provided search filters:
  * - TODO: add filter parameters
  *
- * TODO: Authorization required
+ * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/", async function (req, res, next) {
+router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const recipes = await Recipe.findAll(req.query);
     return res.json({ recipes });
@@ -56,10 +63,10 @@ router.get("/", async function (req, res, next) {
  *  Recipe is { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary, ingredients, nutrients }
  *
- * TODO: Authorization required
+ * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/:id", async function (req, res, next) {
+router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
   try {
     const recipe = await Recipe.get(req.params.id);
     const ingredients = await Recipe.getIngredients(req.params.id);
@@ -80,10 +87,10 @@ router.get("/:id", async function (req, res, next) {
  * Returns { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
  * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary }
  *
- * TODO: Authorization required
+ * Authorization required: admin
  */
 
-router.patch("/:id", async function (req, res, next) {
+router.patch("/:id", ensureAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, recipeUpdateSchema);
     if (!validator.valid) {
@@ -100,10 +107,10 @@ router.patch("/:id", async function (req, res, next) {
 
 /** DELETE /[id]  =>  { deleted: id }
  *
- * TODO: Authorization
+ * Authorization: admin
  */
 
-router.delete("/:id", async function (req, res, next) {
+router.delete("/:id", ensureAdmin, async function (req, res, next) {
   try {
     await Recipe.remove(req.params.id);
     return res.json({ deleted: req.params.id });

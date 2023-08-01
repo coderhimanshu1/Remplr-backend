@@ -5,9 +5,8 @@ const { BadRequestError } = require("../expressError");
 const jsonschema = require("jsonschema");
 const {
   ensureCorrectUserOrAdmin,
+  ensureAdminOrNutritionist,
   ensureAdmin,
-  ensureNutritionist,
-  ensureClient,
 } = require("../middleware/auth");
 const ingredientNewSchema = require("../schemas/ingredientNew.json");
 const ingredientUpdateSchema = require("../schemas/ingredientUpdate.json");
@@ -21,24 +20,20 @@ const ingredientUpdateSchema = require("../schemas/ingredientUpdate.json");
  * Authorization required: admin or nutritionist
  */
 
-router.post(
-  "/",
-  ensureAdmin || ensureNutritionist,
-  async function (req, res, next) {
-    try {
-      const validator = jsonschema.validate(req.body, ingredientNewSchema);
-      if (!validator.valid) {
-        const errs = validator.errors.map((e) => e.stack);
-        throw new BadRequestError(errs);
-      }
-
-      const ingredient = await Ingredient.create(req.body);
-      return res.status(201).json({ ingredient });
-    } catch (err) {
-      return next(err);
+router.post("/", ensureAdminOrNutritionist, async function (req, res, next) {
+  try {
+    const validator = jsonschema.validate(req.body, ingredientNewSchema);
+    if (!validator.valid) {
+      const errs = validator.errors.map((e) => e.stack);
+      throw new BadRequestError(errs);
     }
+
+    const ingredient = await Ingredient.create(req.body);
+    return res.status(201).json({ ingredient });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** GET /  =>
  *   { ingredients: [{id, aisle, image, name, amount, unit, details },...] }

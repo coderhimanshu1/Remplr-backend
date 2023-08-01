@@ -73,6 +73,24 @@ function ensureCorrectUserOrAdmin(req, res, next) {
   }
 }
 
+/** Middleware to use when they must be logged in as admin or nutritionist
+ *  username provided as route param.
+ *
+ *  If not, raises Unauthorized.
+ */
+
+function ensureAdminOrNutritionist(req, res, next) {
+  try {
+    const user = res.locals.user;
+    if (!(user && (user.isAdmin || user.isNutritionist))) {
+      throw new UnauthorizedError();
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
 /** Middleware to use when they must be logged in as a nutritionist.
  *
  * If not, raises Unauthorized.
@@ -112,6 +130,7 @@ module.exports = {
   ensureLoggedIn,
   ensureAdmin,
   ensureCorrectUserOrAdmin,
+  ensureAdminOrNutritionist,
   ensureNutritionist,
   ensureClient,
 };
