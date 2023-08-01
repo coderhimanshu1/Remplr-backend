@@ -116,7 +116,7 @@ router.patch(
  */
 
 router.post(
-  "/:mealPlanId/recipes",
+  "/:mealPlanId/recipes/:recipeId",
   ensureAdminOrNutritionist,
   async function (req, res, next) {
     try {
