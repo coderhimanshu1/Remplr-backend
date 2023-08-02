@@ -112,6 +112,51 @@ class User {
     return user;
   }
 
+  // Link a client to a nutritionist
+  static async linkClientToNutritionist(clientId, nutritionistId) {
+    // Validate that both client and nutritionist exist
+    const client = await db.query(
+      `SELECT id FROM users WHERE id = $1 AND is_client = true`,
+      [clientId]
+    );
+    const nutritionist = await db.query(
+      `SELECT id FROM users WHERE id = $1 AND is_nutritionist = true`,
+      [nutritionistId]
+    );
+
+    if (!client.rows[0]) {
+      throw new NotFoundError(`Client with id ${clientId} does not exist`);
+    }
+
+    if (!nutritionist.rows[0]) {
+      throw new NotFoundError(
+        `Nutritionist with id ${nutritionistId} does not exist`
+      );
+    }
+
+    // Check if the relationship already exists
+    const duplicateCheck = await db.query(
+      `SELECT * FROM client_nutritionist
+          WHERE client_id = $1 AND nutritionist_id = $2`,
+      [clientId, nutritionistId]
+    );
+
+    if (duplicateCheck.rows.length > 0) {
+      throw new BadRequestError(
+        `Client is already linked to this nutritionist`
+      );
+    }
+
+    // Insert the relationship
+    await db.query(
+      `INSERT INTO client_nutritionist (client_id, nutritionist_id)
+        VALUES ($1, $2)`,
+      [clientId, nutritionistId]
+    );
+
+    return `Client ${clientId} is now linked to Nutritionist ${nutritionistId}`;
+  }
+
   /** Find all users.
    *
    * Returns [{ username, first_name, last_name, email, is_admin, is_client, is_nutritionist }, ...]

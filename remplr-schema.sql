@@ -30,6 +30,19 @@ CREATE TABLE IF NOT EXISTS users (
     is_nutritionist BOOLEAN
 );
 
+-- nutritionist and client relationship table
+CREATE TABLE IF NOT EXISTS client_nutritionist (
+    id SERIAL PRIMARY KEY,
+    client_id INT,
+    nutritionist_id INT,
+    FOREIGN KEY (client_id) REFERENCES users(id)
+        ON UPDATE CASCADE,
+    FOREIGN KEY (nutritionist_id) REFERENCES users(id)
+        ON UPDATE CASCADE
+);
+
+
+
 
 -- ingredients table
 CREATE TABLE IF NOT EXISTS ingredients (

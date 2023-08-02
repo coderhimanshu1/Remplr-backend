@@ -11,6 +11,7 @@ const { createToken } = require("../helpers/tokens");
 const userAuthSchema = require("../schemas/userAuth.json");
 const userNewSchema = require("../schemas/userNew.json");
 const { BadRequestError } = require("../expressError");
+const { ensureAdminOrNutritionist } = require("../middleware/auth");
 
 /** POST /auth/token:  { username, password } => { token }
  *
@@ -36,7 +37,7 @@ router.post("/token", async function (req, res, next) {
   }
 });
 
-/**Client Registeration
+/**Route to add new client for nutritionist
  *
  * POST /auth/register/client:   { user } => { token }
  *
@@ -47,26 +48,48 @@ router.post("/token", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.post("/register/client", async function (req, res, next) {
-  try {
-    const validator = jsonschema.validate(req.body, userNewSchema);
-    if (!validator.valid) {
-      const errs = validator.errors.map((e) => e.stack);
-      throw new BadRequestError(errs);
-    }
+router.post(
+  "/client/new",
+  ensureAdminOrNutritionist,
+  async function (req, res, next) {
+    try {
+      // Check for proper validation according to your userNewSchema
+      const validator = jsonschema.validate(req.body, userNewSchema);
+      if (!validator.valid) {
+        const errs = validator.errors.map((e) => e.stack);
+        throw new BadRequestError(errs);
+      }
 
-    const newUser = await User.register({
-      ...req.body,
-      isAdmin: false,
-      isClient: true,
-      isNutritionist: false,
-    });
-    const token = createToken(newUser);
-    return res.status(201).json({ token });
-  } catch (err) {
-    return next(err);
+      // Register the new client
+      const newUser = await User.register({
+        ...req.body,
+        isAdmin: false,
+        isClient: true,
+        isNutritionist: false,
+      });
+
+      // If a nutritionist_username is present in the request, then link the client to the specific nutritionist
+      if (req.body.nutritionist_username) {
+        // Assuming you have a function to find the nutritionist by username
+        const nutritionist = await User.get(req.body.nutritionist_username);
+
+        if (!nutritionist || !nutritionist.isNutritionist) {
+          throw new BadRequestError("Invalid nutritionist username provided.");
+        }
+
+        await User.linkClientToNutritionist({
+          nutritionistId: nutritionist.id,
+          clientId: newUser.id,
+        });
+      }
+
+      const token = createToken(newUser);
+      return res.status(201).json({ token });
+    } catch (err) {
+      return next(err);
+    }
   }
-});
+);
 
 /**Nutritionist Registeration
  *
@@ -79,7 +102,7 @@ router.post("/register/client", async function (req, res, next) {
  * Authorization required: none
  */
 
-router.post("/register/nutritionist", async function (req, res, next) {
+router.post("/register", async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
