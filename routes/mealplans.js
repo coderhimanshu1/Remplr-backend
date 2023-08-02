@@ -190,7 +190,7 @@ router.post(
           "Nutritionist username, and client username are required"
         );
 
-      const result = await MealPlanService.shareMealPlan(
+      const result = await MealPlan.shareMealPlan(
         req.params.mealPlanId,
         nutritionistUsername,
         clientUsername
@@ -221,9 +221,7 @@ router.get(
         return res.status(400).json({ error: "Client username is required" });
       }
 
-      const mealPlans = await MealPlanService.getSharedMealPlans(
-        clientUsername
-      );
+      const mealPlans = await MealPlan.getSharedMealPlans(clientUsername);
       return res.status(200).json(mealPlans);
     } catch (error) {
       // Forward the error to an error handling middleware

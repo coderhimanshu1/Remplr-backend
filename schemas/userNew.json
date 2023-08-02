@@ -23,6 +23,11 @@
       "minLength": 1,
       "maxLength": 30
     },
+    "nutritionist_username": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 30
+    },
     "email": {
       "type": "string",
       "minLength": 6,

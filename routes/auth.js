@@ -51,7 +51,7 @@ router.post("/token", async function (req, res, next) {
 router.post(
   "/client/new",
   ensureAdminOrNutritionist,
-  async function (req, res, next) {
+  async (req, res, next) => {
     try {
       // Check for proper validation according to your userNewSchema
       const validator = jsonschema.validate(req.body, userNewSchema);
@@ -68,20 +68,19 @@ router.post(
         isNutritionist: false,
       });
 
-      // If a nutritionist_username is present in the request, then link the client to the specific nutritionist
-      if (req.body.nutritionist_username) {
-        // Assuming you have a function to find the nutritionist by username
-        const nutritionist = await User.get(req.body.nutritionist_username);
+      // Get nutritionist by username
+      const nutritionist = await User.get(req.body.nutritionist_username);
 
-        if (!nutritionist || !nutritionist.isNutritionist) {
-          throw new BadRequestError("Invalid nutritionist username provided.");
-        }
-
-        await User.linkClientToNutritionist(nutritionist.id, newUser.id);
+      if (!nutritionist || !nutritionist.isNutritionist) {
+        throw new BadRequestError("Nutritionist username is required.");
       }
 
-      const token = createToken(newUser);
-      return res.status(201).json({ token });
+      const result = await User.linkClientToNutritionist(
+        newUser.id,
+        nutritionist.id
+      );
+
+      return res.status(201).json({ message: result });
     } catch (err) {
       return next(err);
     }
@@ -99,7 +98,7 @@ router.post(
  * Authorization required: none
  */
 
-router.post("/register", async function (req, res, next) {
+router.post("/register", async (req, res, next) => {
   try {
     const validator = jsonschema.validate(req.body, userNewSchema);
     if (!validator.valid) {
