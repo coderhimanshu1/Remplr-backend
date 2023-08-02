@@ -8,6 +8,7 @@ const {
   ensureLoggedIn,
   ensureCorrectUserOrAdmin,
   ensureAdminOrNutritionist,
+  ensureAdminOrClient,
   ensureAdmin,
   ensureNutritionist,
   ensureClient,
@@ -170,7 +171,7 @@ router.delete("/:mealPlanId", ensureAdmin, async function (req, res, next) {
 });
 
 /**
- * POST /:mealPlanId/share { mealPlan } => { : recipeId }
+ * POST /:mealPlanId/share { mealPlan } => { message: Meal plan ${mealPlanId} is now shared with client ${clientUsername} by nutritionist ${nutritionistUsername} }
  *
  * This route is used to allow nutritionist to share a specified meal plan to client
  *
@@ -196,6 +197,36 @@ router.post(
       );
       return res.status(200).json({ message: result });
     } catch (error) {
+      return next(error);
+    }
+  }
+);
+
+/**
+ * GET /shared/:clientUsername  => { mealplans }
+ *
+ * This route is used to get shared meal plan to client
+ *
+ * Authorization required: admin or client
+ */
+
+router.get(
+  "/shared/:clientUsername",
+  ensureAdminOrClient,
+  async (req, res, next) => {
+    try {
+      const { clientUsername } = req.params;
+
+      if (!clientUsername) {
+        return res.status(400).json({ error: "Client username is required" });
+      }
+
+      const mealPlans = await MealPlanService.getSharedMealPlans(
+        clientUsername
+      );
+      return res.status(200).json(mealPlans);
+    } catch (error) {
+      // Forward the error to an error handling middleware
       return next(error);
     }
   }

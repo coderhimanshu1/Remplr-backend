@@ -258,6 +258,40 @@ class MealPlan {
 
     return `Meal plan ${mealPlanId} is now shared with client ${clientUsername} by nutritionist ${nutritionistUsername}`;
   }
+
+  /** Given a client username, return data about mealPlanDetails associated with that client.
+   *
+   * Returns { id, name, created_by, recipes: [{ { id, vegetarian, vegan, dairyfree, weightwatchersmartpoints, creditstext,
+   * title, readyinminutes, servings, sourceurl, image, imagetype, dishtype, diets, summary } ,meal_type, meal_day}, ...] }
+   *
+   **/
+  static async getSharedMealPlans(clientUsername) {
+    try {
+      // Get client ID using the provided client username
+      const client = await User.get(clientUsername);
+      const clientId = client.id;
+
+      // Get meal plan IDs shared with this client from the shared_mealplans table
+      const sharedMealPlans = await db.query(
+        "SELECT mealplan_id FROM shared_mealplans WHERE client_id = $1",
+        [clientId]
+      );
+
+      // Initialize an array to store the meal plan details
+      const mealPlanDetails = [];
+
+      // Loop through the meal plan IDs and fetch the details for each meal plan
+      for (const sharedMealPlan of sharedMealPlans) {
+        const mealPlanId = sharedMealPlan.mealplan_id;
+        const mealPlan = await MealPlan.get(mealPlanId);
+        mealPlanDetails.push(mealPlan);
+      }
+
+      return mealPlanDetails;
+    } catch (err) {
+      throw err;
+    }
+  }
 }
 
 module.exports = MealPlan;
