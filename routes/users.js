@@ -245,7 +245,7 @@ router.get(
 
 router.get(
   "/:username/mealplans",
-  ensureCorrectUserOrAdmin,
+  ensureAdminOrNutritionist,
   async (req, res, next) => {
     try {
       const mealplans = await User.getSavedMealPlans(req.params.username);

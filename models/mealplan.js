@@ -14,22 +14,24 @@ class MealPlan {
    * Returns { id, name, created_by }
    **/
 
-  static async create(data) {
+  static async create({ name, created_by }) {
     // Check if a meal plan with the same name already exists
     const duplicateCheck = await db.query(
       `SELECT * FROM meal_plans WHERE name = $1`,
-      [data.name]
+      [name]
     );
 
     if (duplicateCheck.rows.length > 0)
-      throw new BadRequestError(`Duplicate mealPlan: ${data.name}`);
+      throw new BadRequestError(`Duplicate mealPlan: ${name}`);
+
+    const nutritionist = await User.get(created_by);
 
     // Create the meal plan
     const result = await db.query(
       `INSERT INTO meal_plans (name, created_by)
            VALUES ($1, $2)
            RETURNING id, name, created_by`,
-      [data.name, data.created_by]
+      [name, nutritionist.id]
     );
 
     let mealPlan = result.rows[0];
@@ -206,7 +208,7 @@ class MealPlan {
 
   static async shareMealPlan(mealPlanId, nutritionistUsername, clientUsername) {
     // Validate that the meal plan exists
-    const mealPlan = await db.query(`SELECT id FROM mealplans WHERE id = $1`, [
+    const mealPlan = await db.query(`SELECT id FROM meal_plans WHERE id = $1`, [
       mealPlanId,
     ]);
     if (!mealPlan.rows[0]) {
@@ -215,13 +217,17 @@ class MealPlan {
 
     // Validate that the usernames correspond to a nutritionist and a client
     const nutritionist = await db.query(
-      `SELECT username FROM users WHERE username = $1 AND is_nutritionist = true`,
+      `SELECT id FROM users WHERE username = $1 AND is_nutritionist = true`,
       [nutritionistUsername]
     );
+
+    const nutritionist_id = nutritionist.rows[0].id;
+
     const client = await db.query(
-      `SELECT username FROM users WHERE username = $1 AND is_client = true`,
+      `SELECT id FROM users WHERE username = $1 AND is_client = true`,
       [clientUsername]
     );
+    const client_id = client.rows[0].id;
 
     if (!nutritionist.rows[0]) {
       throw new NotFoundError(
@@ -238,16 +244,13 @@ class MealPlan {
     // Check if the meal plan is already shared with the client
     const duplicateCheck = await db.query(
       `SELECT * FROM shared_mealplans
-          WHERE mealplan_id = $1 AND client_username = $2`,
-      [mealPlanId, clientUsername]
+          WHERE mealplan_id = $1 AND client_id = $2`,
+      [mealPlanId, client_id]
     );
 
     if (duplicateCheck.rows.length > 0) {
       throw new BadRequestError(`Meal plan is already shared with this client`);
     }
-
-    const nutritionist_id = nutritionist.id;
-    const client_id = client.id;
 
     // Share the meal plan
     await db.query(
@@ -277,11 +280,13 @@ class MealPlan {
         [clientId]
       );
 
+      console.log("sharedMealPlans", sharedMealPlans);
+
       // Initialize an array to store the meal plan details
       const mealPlanDetails = [];
 
       // Loop through the meal plan IDs and fetch the details for each meal plan
-      for (const sharedMealPlan of sharedMealPlans) {
+      for (const sharedMealPlan of sharedMealPlans.rows) {
         const mealPlanId = sharedMealPlan.mealplan_id;
         const mealPlan = await MealPlan.get(mealPlanId);
         mealPlanDetails.push(mealPlan);
