@@ -153,7 +153,7 @@ router.delete(
 );
 
 /**
- * DELETE /[mealPlanId] { recipe } => { deleted: mealPlanId }
+ * DELETE /[mealPlanId] { mealPlan } => { deleted: mealPlanId }
  *
  * This route is used to delete the specified meal plan.
  *
@@ -168,5 +168,37 @@ router.delete("/:mealPlanId", ensureAdmin, async function (req, res, next) {
     return next(err);
   }
 });
+
+/**
+ * POST /:mealPlanId/share { mealPlan } => { : recipeId }
+ *
+ * This route is used to allow nutritionist to share a specified meal plan to client
+ *
+ * Authorization required: admin or nutritionist
+ */
+
+router.post(
+  "/:mealPlanId/share",
+  ensureAdminOrNutritionist,
+  async (req, res, next) => {
+    try {
+      const { nutritionistUsername, clientUsername } = req.body;
+
+      if (!nutritionistUsername || !clientUsername)
+        throw new BadRequestError(
+          "Nutritionist username, and client username are required"
+        );
+
+      const result = await MealPlanService.shareMealPlan(
+        req.params.mealPlanId,
+        nutritionistUsername,
+        clientUsername
+      );
+      return res.status(200).json({ message: result });
+    } catch (error) {
+      return next(error);
+    }
+  }
+);
 
 module.exports = router;

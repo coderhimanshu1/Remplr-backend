@@ -77,10 +77,7 @@ router.post(
           throw new BadRequestError("Invalid nutritionist username provided.");
         }
 
-        await User.linkClientToNutritionist({
-          nutritionistId: nutritionist.id,
-          clientId: newUser.id,
-        });
+        await User.linkClientToNutritionist(nutritionist.id, newUser.id);
       }
 
       const token = createToken(newUser);

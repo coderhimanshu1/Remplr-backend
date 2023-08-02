@@ -42,8 +42,6 @@ CREATE TABLE IF NOT EXISTS client_nutritionist (
 );
 
 
-
-
 -- ingredients table
 CREATE TABLE IF NOT EXISTS ingredients (
     id SERIAL PRIMARY KEY,
@@ -153,4 +151,16 @@ CREATE TABLE IF NOT EXISTS user_saved_meal_plans (
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id)
     ON UPDATE CASCADE
+);
+
+-- 
+
+CREATE TABLE shared_mealplans (
+  mealplan_id INT NOT NULL,
+  nutritionist_id INT NOT NULL,
+  client_id INT NOT NULL,
+  UNIQUE (mealplan_id),
+  FOREIGN KEY (mealplan_id) REFERENCES meal_plans(id),
+  FOREIGN KEY (nutritionist_id) REFERENCES users(id),
+  FOREIGN KEY (client_id) REFERENCES users(id)
 );

@@ -3,6 +3,7 @@
 const db = require("../db");
 const { NotFoundError, BadRequestError } = require("../expressError");
 const Recipe = require("./recipe");
+const User = require("./user");
 const { sqlForPartialUpdate } = require("../helpers/sql");
 
 class MealPlan {
@@ -196,6 +197,66 @@ class MealPlan {
     } catch (err) {
       throw err;
     }
+  }
+
+  /** Allow Nutritionist to share a mealPlan to client
+   *
+   * Throws NotFoundError if meal plan, client or nutritionist not found.
+   **/
+
+  static async shareMealPlan(mealPlanId, nutritionistUsername, clientUsername) {
+    // Validate that the meal plan exists
+    const mealPlan = await db.query(`SELECT id FROM mealplans WHERE id = $1`, [
+      mealPlanId,
+    ]);
+    if (!mealPlan.rows[0]) {
+      throw new NotFoundError(`Meal plan with id ${mealPlanId} does not exist`);
+    }
+
+    // Validate that the usernames correspond to a nutritionist and a client
+    const nutritionist = await db.query(
+      `SELECT username FROM users WHERE username = $1 AND is_nutritionist = true`,
+      [nutritionistUsername]
+    );
+    const client = await db.query(
+      `SELECT username FROM users WHERE username = $1 AND is_client = true`,
+      [clientUsername]
+    );
+
+    if (!nutritionist.rows[0]) {
+      throw new NotFoundError(
+        `Nutritionist with username ${nutritionistUsername} does not exist`
+      );
+    }
+
+    if (!client.rows[0]) {
+      throw new NotFoundError(
+        `Client with username ${clientUsername} does not exist`
+      );
+    }
+
+    // Check if the meal plan is already shared with the client
+    const duplicateCheck = await db.query(
+      `SELECT * FROM shared_mealplans
+          WHERE mealplan_id = $1 AND client_username = $2`,
+      [mealPlanId, clientUsername]
+    );
+
+    if (duplicateCheck.rows.length > 0) {
+      throw new BadRequestError(`Meal plan is already shared with this client`);
+    }
+
+    const nutritionist_id = nutritionist.id;
+    const client_id = client.id;
+
+    // Share the meal plan
+    await db.query(
+      `INSERT INTO shared_mealplans (mealplan_id, nutritionist_id, client_id)
+        VALUES ($1, $2, $3)`,
+      [mealPlanId, nutritionist_id, client_id]
+    );
+
+    return `Meal plan ${mealPlanId} is now shared with client ${clientUsername} by nutritionist ${nutritionistUsername}`;
   }
 }
 
