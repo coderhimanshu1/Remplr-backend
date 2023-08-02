@@ -9,6 +9,7 @@ const {
   ensureAdmin,
   ensureNutritionist,
   ensureClient,
+  ensureLoggedIn,
 } = require("../middleware/auth");
 const recipeNewSchema = require("../schemas/recipeNew.json");
 const recipeUpdateSchema = require("../schemas/recipeUpdate.json");
@@ -49,7 +50,7 @@ router.post("/", ensureAdminOrNutritionist, async function (req, res, next) {
  * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get("/", ensureLoggedIn, async function (req, res, next) {
   try {
     const recipes = await Recipe.findAll(req.query);
     return res.json({ recipes });
@@ -66,7 +67,7 @@ router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
  * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get("/:id", ensureLoggedIn, async function (req, res, next) {
   try {
     const recipe = await Recipe.get(req.params.id);
     const ingredients = await Recipe.getIngredients(req.params.id);
