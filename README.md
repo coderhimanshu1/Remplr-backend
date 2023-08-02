@@ -4,7 +4,8 @@ Node.js based backend API for REMPLR 2.0
 ## REMPLR Design Architecture
 
 
-<img width="2139" alt="REMPLR Design Architecture" src="https://github.com/coderhimanshu1/Remplr-backend/assets/87880250/0005961c-9c0a-42cc-824a-1445436ff158">
+<img width="2164" alt="REMPLR Design Architecture" src="https://github.com/coderhimanshu1/Remplr-backend/assets/87880250/546d1ac0-64b6-4666-a31a-549bd5e88e49">
+
 
 
 ## REMPLR Database Schema
