@@ -7,6 +7,7 @@ const {
   ensureCorrectUserOrAdmin,
   ensureAdminOrNutritionist,
   ensureAdmin,
+  ensureLoggedIn,
 } = require("../middleware/auth");
 const ingredientNewSchema = require("../schemas/ingredientNew.json");
 const ingredientUpdateSchema = require("../schemas/ingredientUpdate.json");
@@ -44,7 +45,7 @@ router.post("/", ensureAdminOrNutritionist, async function (req, res, next) {
  * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/", ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get("/", ensureLoggedIn, async function (req, res, next) {
   try {
     const ingredients = await Ingredient.findAll(req.query);
     return res.json({ ingredients });

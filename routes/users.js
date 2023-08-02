@@ -10,6 +10,7 @@ const {
   ensureAdmin,
   ensureNutritionist,
   ensureClient,
+  ensureAdminOrNutritionist,
 } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
@@ -162,7 +163,7 @@ router.post(
     try {
       const { username, recipeId } = req.params;
       const recipe = await User.saveRecipe(username, recipeId);
-      return res.status(201).json({ recipe });
+      return res.status(201).json({ "Saved ingredient with id": recipeId });
     } catch (err) {
       return next(err);
     }
@@ -179,7 +180,7 @@ router.post(
  **/
 router.post(
   "/:username/mealplans/:mealPlanId",
-  ensureAdmin || ensureNutritionist,
+  ensureAdminOrNutritionist,
   async (req, res, next) => {
     try {
       const { username, mealPlanId } = req.params;

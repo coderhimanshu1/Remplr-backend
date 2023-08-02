@@ -196,7 +196,7 @@ class User {
                                 first_name AS "firstName",
                                 last_name AS "lastName",
                                 email,
-                                is_admin AS "isAdmin,
+                                is_admin AS "isAdmin",
                                 is_client AS "isClient",
                                 is_nutritionist AS "isNutritionist"`;
     const result = await db.query(querySql, [...values, username]);
@@ -230,17 +230,35 @@ class User {
       const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
         username,
       ]);
+
+      if (user.rows.length === 0) {
+        throw new NotFoundError(`User not found`);
+      }
+
       const userId = user.rows[0].id;
 
-      // check if Ingredient is already saved
+      // Check if the ingredient exists in the ingredients table
+      const ingredient = await db.query(
+        `SELECT * FROM ingredients WHERE id = $1`,
+        [ingredientId]
+      );
+
+      if (!ingredient.rows[0]) {
+        throw new NotFoundError(
+          `Ingredient with id ${ingredientId} does not exist `
+        );
+      }
+
+      // Check if Ingredient is already saved
       const duplicateCheck = await db.query(
         `SELECT * FROM user_saved_ingredients
-            WHERE user_id = $1 AND ingredient_id = $2`,
+          WHERE user_id = $1 AND ingredient_id = $2`,
         [userId, ingredientId]
       );
 
-      if (duplicateCheck.rows.length > 0)
+      if (duplicateCheck.rows.length > 0) {
         throw new BadRequestError(`Ingredient already saved`);
+      }
 
       // Then, insert the ingredient using the retrieved userId
       const result = await db.query(
@@ -249,6 +267,7 @@ class User {
           RETURNING id`,
         [userId, ingredientId]
       );
+
       return result.rows[0];
     } catch (err) {
       // Handle any errors that might occur during the database queries
@@ -265,7 +284,16 @@ class User {
       ]);
       const userId = user.rows[0].id;
 
-      // check if Ingredient is already saved
+      // Check if the recipe exists in the recipes table
+      const recipe = await db.query(`SELECT * FROM recipes WHERE id = $1`, [
+        recipeId,
+      ]);
+
+      if (!recipe.rows[0]) {
+        throw new NotFoundError(`Recipe with id ${recipeId} does not exist `);
+      }
+
+      // check if recipe is already saved
       const duplicateCheck = await db.query(
         `SELECT * FROM user_saved_recipes
             WHERE user_id = $1 AND recipe_id = $2`,
@@ -296,6 +324,26 @@ class User {
       username,
     ]);
     const userId = user.rows[0].id;
+
+    // Check if the meal plan exists in the ingredients table
+    const mealPlan = await db.query(`SELECT * FROM meal_plans WHERE id = $1`, [
+      mealPlanId,
+    ]);
+
+    if (!mealPlan.rows[0])
+      throw new NotFoundError(
+        `Meal Plan with id ${mealPlanId} does not exist `
+      );
+
+    // check if meal plan is already saved
+    const duplicateCheck = await db.query(
+      `SELECT * FROM user_saved_meal_plans
+          WHERE user_id = $1 AND meal_plan_id = $2`,
+      [userId, mealPlanId]
+    );
+
+    if (duplicateCheck.rows.length > 0)
+      throw new BadRequestError(`Meal Plan already saved`);
 
     const result = await db.query(
       `INSERT INTO user_saved_meal_plans (user_id, meal_plan_id)
@@ -336,7 +384,7 @@ class User {
       `
         SELECT r.* 
         FROM recipes AS r
-        JOIN user_saved_recipes AS usr ON r.id = usr.ingredient_id
+        JOIN user_saved_recipes AS usr ON r.id = usr.recipe_id
         WHERE usr.user_id = $1`,
       [userId]
     );
@@ -355,7 +403,7 @@ class User {
       `
         SELECT m.* 
         FROM meal_plans AS m
-        JOIN user_saved_meal_plans AS usm ON m.id = usm.recipe_id
+        JOIN user_saved_meal_plans AS usm ON m.id = usm.meal_plan_id
         WHERE usm.user_id = $1`,
       [userId]
     );
