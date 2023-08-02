@@ -21,7 +21,7 @@ class Ingredient {
         unit,
         original)
            VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id, aisle, image, name, amount, unit, original as details"`,
+           RETURNING id, aisle, image, name, amount, unit, original as "details"`,
       [data.aisle, data.image, data.name, data.amount, data.unit, data.original]
     );
     let ingredient = result.rows[0];

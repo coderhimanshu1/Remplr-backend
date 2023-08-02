@@ -61,7 +61,7 @@ router.get("/", ensureLoggedIn, async function (req, res, next) {
  * Authorization required: admin or same-user-as-:username
  */
 
-router.get("/:id", ensureCorrectUserOrAdmin, async function (req, res, next) {
+router.get("/:id", ensureLoggedIn, async function (req, res, next) {
   try {
     const ingredient = await Ingredient.get(req.params.id);
     return res.json({ ingredient });
