@@ -121,7 +121,6 @@ CREATE TABLE IF NOT EXISTS meal_plan_recipes (
 );
 
 -- user_saved_ingredients table
-
 CREATE TABLE IF NOT EXISTS user_saved_ingredients (
     id SERIAL PRIMARY KEY,
     user_id INT,
@@ -132,7 +131,6 @@ CREATE TABLE IF NOT EXISTS user_saved_ingredients (
 );
 
 -- user_saved_recipes table
-
 CREATE TABLE IF NOT EXISTS user_saved_recipes (
     id SERIAL PRIMARY KEY,
     user_id INT,
@@ -143,7 +141,6 @@ CREATE TABLE IF NOT EXISTS user_saved_recipes (
 );
 
 -- user_saved_meal_plans table
-
 CREATE TABLE IF NOT EXISTS user_saved_meal_plans (
     id SERIAL PRIMARY KEY,
     user_id INT,
@@ -153,8 +150,7 @@ CREATE TABLE IF NOT EXISTS user_saved_meal_plans (
     ON UPDATE CASCADE
 );
 
--- 
-
+-- shared meal plans
 CREATE TABLE shared_mealplans (
   mealplan_id INT NOT NULL,
   nutritionist_id INT NOT NULL,
