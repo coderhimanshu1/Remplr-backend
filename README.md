@@ -1,4 +1,4 @@
-[![Github](github.png)]([https://github.com/coderhimanshu1/Job-Search-API](https://github.com/coderhimanshu1/Remplr-backend))
+[![Github](github.png)]([https://github.com/coderhimanshu1/Remplr-backend](https://github.com/coderhimanshu1/Remplr-backend))
 
 # Remplr-backend
 Node.js-based backend API for REMPLR 2.0
