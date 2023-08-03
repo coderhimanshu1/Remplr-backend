@@ -12,7 +12,7 @@ const authRoutes = require("./routes/auth");
 const usersRoutes = require("./routes/users");
 const ingredientsRoutes = require("./routes/ingredients");
 const recipesRoutes = require("./routes/recipes");
-const mealPlansRoutes = require("./routes/mealPlans");
+const mealPlansRoutes = require("./routes/mealplans");
 
 const morgan = require("morgan");
 
