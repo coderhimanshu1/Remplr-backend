@@ -39,7 +39,7 @@ router.post("/token", async function (req, res, next) {
 
 /**Route to add new client for nutritionist
  *
- * POST /auth/register/client:   { user } => { token }
+ * POST /auth/register/client:   { user } => { message: Client ${clientId} is now linked to Nutritionist ${nutritionistId} }
  *
  * user must include { username, password, firstName, lastName, email }
  *
