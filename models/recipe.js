@@ -121,6 +121,18 @@ class Recipe {
 
     if (!recipe) throw new NotFoundError(`No recipe: ${id}`);
 
+    // Get the instructions for the recipe
+    const instructionsRes = await db.query(
+      `SELECT number, step
+       FROM instructions
+       WHERE recipe_id = $1
+       ORDER BY number`,
+      [id]
+    );
+
+    // Attach the instructions to the recipe object
+    recipe.instructions = instructionsRes.rows;
+
     return recipe;
   }
 
