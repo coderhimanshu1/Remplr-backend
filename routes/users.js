@@ -74,7 +74,7 @@ router.get("/", ensureAdmin, async (req, res, next) => {
  * Authorization required: admin or same user-as-:username
  **/
 
-router.get("/:username", ensureCorrectUserOrAdmin, async (req, res, next) => {
+router.get("/:username", async (req, res, next) => {
   try {
     const user = await User.get(req.params.username);
     return res.json({ user });
