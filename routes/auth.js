@@ -27,7 +27,6 @@ router.post("/token", async function (req, res, next) {
       const errs = validator.errors.map((e) => e.stack);
       throw new BadRequestError(errs);
     }
-
     const { username, password } = req.body;
     const user = await User.authenticate(username, password);
     const token = createToken(user);

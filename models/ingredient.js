@@ -93,7 +93,7 @@ class Ingredient {
       name: row.nutrientName,
       amount: row.nutrientAmount,
       unit: row.nutrientUnit,
-      percentOfDailyNeeds: row.percentOfDailyNeeds,
+      percentofdailyneeds: row.percentOfDailyNeeds,
     }));
 
     return { id, aisle, image, name, amount, unit, details, nutrients };
