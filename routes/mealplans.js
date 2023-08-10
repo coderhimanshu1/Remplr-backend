@@ -28,7 +28,7 @@ router.post("/", ensureAdminOrNutritionist, async (req, res, next) => {
   try {
     // Create the meal plan
     const mealPlan = await MealPlan.create({
-      name: req.body.name,
+      name: req.body.mealPlanName,
       created_by: req.body.created_by,
     });
 

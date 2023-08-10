@@ -17,8 +17,6 @@ function createToken(user) {
     isNutritionist: user.isNutritionist || false,
     isClient: user.isClient || false,
   };
-
-  console.log("payload>>>>>", payload);
   return jwt.sign(payload, SECRET_KEY);
 }
 
