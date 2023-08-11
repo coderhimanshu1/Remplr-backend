@@ -11,6 +11,7 @@ const {
   ensureNutritionist,
   ensureClient,
   ensureAdminOrNutritionist,
+  ensureLoggedIn,
 } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
@@ -201,18 +202,14 @@ router.post(
  * Authorization required:  admin or same-user-as-:username
  **/
 
-router.get(
-  "/:username/ingredients",
-  ensureCorrectUserOrAdmin,
-  async (req, res, next) => {
-    try {
-      const ingredients = await User.getSavedIngredients(req.params.username);
-      return res.json(ingredients);
-    } catch (err) {
-      return next(err);
-    }
+router.get("/:username/ingredients", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const ingredients = await User.getSavedIngredients(req.params.username);
+    return res.json(ingredients);
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** GET /[username]/recipes => { recipes }
  *
@@ -223,18 +220,14 @@ router.get(
  * Authorization required: admin or same-user-as-:username
  **/
 
-router.get(
-  "/:username/recipes",
-  ensureCorrectUserOrAdmin,
-  async (req, res, next) => {
-    try {
-      const recipes = await User.getSavedRecipes(req.params.username);
-      return res.json({ recipes });
-    } catch (err) {
-      return next(err);
-    }
+router.get("/:username/recipes", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const recipes = await User.getSavedRecipes(req.params.username);
+    return res.json({ recipes });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 /** GET /[username]/mealplans => { mealplans }
  *
@@ -243,17 +236,13 @@ router.get(
  * Authorization required: admin or same-user-as-:username
  **/
 
-router.get(
-  "/:username/mealplans",
-  ensureAdminOrNutritionist,
-  async (req, res, next) => {
-    try {
-      const mealplans = await User.getSavedMealPlans(req.params.username);
-      return res.json({ mealplans });
-    } catch (err) {
-      return next(err);
-    }
+router.get("/:username/mealplans", ensureLoggedIn, async (req, res, next) => {
+  try {
+    const mealplans = await User.getSavedMealPlans(req.params.username);
+    return res.json({ mealplans });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
 module.exports = router;
