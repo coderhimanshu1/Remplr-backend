@@ -30,6 +30,7 @@ router.post("/", ensureAdminOrNutritionist, async (req, res, next) => {
     const mealPlan = await MealPlan.create({
       name: req.body.mealPlanName,
       created_by: req.body.created_by,
+      user_id: req.body.user_id,
     });
 
     // Add each recipe to the meal plan
@@ -75,6 +76,7 @@ router.get(
   async (req, res, next) => {
     try {
       const mealPlan = await MealPlan.get(req.params.mealPlanId);
+      console.log(mealPlan);
       return res.json({ mealPlan });
     } catch (err) {
       return next(err);
