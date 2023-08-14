@@ -14,7 +14,7 @@ class MealPlan {
    * Returns { id, name, created_by }
    **/
 
-  static async create({ name, created_by }) {
+  static async create({ name, created_by, user_id }) {
     // Check if a meal plan with the same name already exists
     const duplicateCheck = await db.query(
       `SELECT * FROM meal_plans WHERE name = $1`,
@@ -26,10 +26,10 @@ class MealPlan {
 
     // Create the meal plan
     const result = await db.query(
-      `INSERT INTO meal_plans (name, created_by)
+      `INSERT INTO meal_plans (name, created_by, user_id)
            VALUES ($1, $2)
            RETURNING id, name, created_by`,
-      [name, created_by]
+      [name, created_by, user_id]
     );
 
     let mealPlan = result.rows[0];

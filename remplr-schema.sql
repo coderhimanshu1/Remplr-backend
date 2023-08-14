@@ -103,8 +103,9 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
 CREATE TABLE IF NOT EXISTS meal_plans (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255),
-    created_by INT,
-    FOREIGN KEY (created_by) REFERENCES users(id)
+    created_by VARCHAR(255),
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
     ON UPDATE CASCADE
 );
 
