@@ -24,14 +24,12 @@ class MealPlan {
     if (duplicateCheck.rows.length > 0)
       throw new BadRequestError(`Duplicate mealPlan: ${name}`);
 
-    const nutritionist = await User.get(created_by);
-
     // Create the meal plan
     const result = await db.query(
       `INSERT INTO meal_plans (name, created_by)
            VALUES ($1, $2)
            RETURNING id, name, created_by`,
-      [name, nutritionist.id]
+      [name, created_by]
     );
 
     let mealPlan = result.rows[0];
