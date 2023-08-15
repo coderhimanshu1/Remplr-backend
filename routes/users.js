@@ -245,4 +245,52 @@ router.get("/:username/mealplans", ensureLoggedIn, async (req, res, next) => {
   }
 });
 
+/** DELETE /[username]/recipes/{recipeId} => { msg }
+ *
+ * Removes associated recipe from a user.
+ *
+ * Returns { msg }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+router.delete(
+  "/:username/recipes/:recipeId",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const { username, recipeId } = req.params;
+      const recipe = await User.deleteSavedRecipe(username, recipeId);
+      return res
+        .status(202)
+        .json({ "Removed recipe from saved recipes": recipeId });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
+/** DELETE /[username]/ingredients/{ingredientId} => { msg }
+ *
+ * Removes associated ingredient from a user.
+ *
+ * Returns { msg }
+ *
+ * Authorization required: admin or same-user-as-:username
+ **/
+router.delete(
+  "/:username/ingredients/:ingredientId",
+  ensureCorrectUserOrAdmin,
+  async (req, res, next) => {
+    try {
+      const { username, ingredientId } = req.params;
+      const recipe = await User.deleteSavedRecipe(username, ingredientId);
+      return res
+        .status(202)
+        .json({ "Removed ingredient from saved recipes": ingredientId });
+    } catch (err) {
+      return next(err);
+    }
+  }
+);
+
 module.exports = router;
