@@ -136,7 +136,8 @@ class MealPlan {
             r.summary
      FROM meal_plan_recipes AS mpr
      JOIN recipes AS r ON mpr.recipe_id = r.id
-     WHERE mpr.meal_plan_id = $1`,
+     WHERE mpr.meal_plan_id = $1
+     ORDER BY mpr.meal_type`,
       [id]
     );
 
