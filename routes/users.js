@@ -286,7 +286,7 @@ router.delete(
       const recipe = await User.deleteSavedRecipe(username, ingredientId);
       return res
         .status(202)
-        .json({ "Removed ingredient from saved recipes": ingredientId });
+        .json({ "Removed ingredient from saved ingredients": ingredientId });
     } catch (err) {
       return next(err);
     }
