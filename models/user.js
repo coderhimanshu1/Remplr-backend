@@ -455,6 +455,98 @@ class User {
 
     return mealPlansRes.rows;
   }
+
+  // Delete a saved recipe for a given user
+  static async deleteSavedRecipe(username, recipeId) {
+    try {
+      // First, retrieve the userId based on the username
+      const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
+        username,
+      ]);
+      const userId = user.rows[0].id;
+
+      // Check if the recipe exists in the recipes table
+      const recipe = await db.query(`SELECT * FROM recipes WHERE id = $1`, [
+        recipeId,
+      ]);
+
+      if (!recipe.rows[0]) {
+        throw new NotFoundError(`Recipe with id ${recipeId} does not exist`);
+      }
+
+      // check if recipe is actually saved
+      const savedCheck = await db.query(
+        `SELECT * FROM user_saved_recipes
+          WHERE user_id = $1 AND recipe_id = $2`,
+        [userId, recipeId]
+      );
+
+      if (savedCheck.rows.length === 0) {
+        throw new BadRequestError(`Recipe not saved by this user`);
+      }
+
+      // Delete the saved recipe using the retrieved userId and recipeId
+      await db.query(
+        `DELETE FROM user_saved_recipes WHERE user_id = $1 AND recipe_id = $2`,
+        [userId, recipeId]
+      );
+
+      return { message: "Recipe successfully deleted" };
+    } catch (err) {
+      // Handle any errors that might occur during the database queries
+      throw err;
+    }
+  }
+
+  // Delete a saved ingredient for a given user
+  static async deleteSavedIngredient(username, ingredientId) {
+    try {
+      // First, retrieve the userId based on the username
+      const user = await db.query(`SELECT id FROM users WHERE username = $1`, [
+        username,
+      ]);
+
+      if (user.rows.length === 0) {
+        throw new NotFoundError(`User not found`);
+      }
+
+      const userId = user.rows[0].id;
+
+      // Check if the ingredient exists in the ingredients table
+      const ingredient = await db.query(
+        `SELECT * FROM ingredients WHERE id = $1`,
+        [ingredientId]
+      );
+
+      if (!ingredient.rows[0]) {
+        throw new NotFoundError(
+          `Ingredient with id ${ingredientId} does not exist`
+        );
+      }
+
+      // Check if the ingredient is actually saved by the user
+      const savedCheck = await db.query(
+        `SELECT * FROM user_saved_ingredients
+          WHERE user_id = $1 AND ingredient_id = $2`,
+        [userId, ingredientId]
+      );
+
+      if (savedCheck.rows.length === 0) {
+        throw new BadRequestError(`Ingredient not saved by this user`);
+      }
+
+      // Delete the saved ingredient using the retrieved userId and ingredientId
+      await db.query(
+        `DELETE FROM user_saved_ingredients WHERE user_id = $1 AND ingredient_id = $2`,
+        [userId, ingredientId]
+      );
+
+      return { message: "Ingredient successfully deleted" };
+    } catch (err) {
+      // Handle any errors that might occur during the database queries
+      throw err;
+    }
+  }
 }
 
 module.exports = User;
