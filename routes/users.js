@@ -283,7 +283,7 @@ router.delete(
   async (req, res, next) => {
     try {
       const { username, ingredientId } = req.params;
-      const recipe = await User.deleteSavedRecipe(username, ingredientId);
+      const recipe = await User.deleteSavedIngredient(username, ingredientId);
       return res
         .status(202)
         .json({ "Removed ingredient from saved ingredients": ingredientId });
