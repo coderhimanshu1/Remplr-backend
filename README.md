@@ -58,52 +58,86 @@ I’ll suggest using the following base URL which is already deployed:
 
 ## Recipes
 
-### Create a new recipe
-
-**POST** `/`
-
+### 1. Create a new recipe
+**POST** `/recipes/`
 - **Description**: Create a new recipe.
 - **Body**: JSON object containing recipe details.
 - **Authorization**: Admin or Nutritionist.
 - **Response**: JSON object containing the created recipe.
-- **Status Code**: `201` Created.
+- **Status Code**: 201 Created.
 
-### Retrieve all recipes
-
-**GET** `/`
-
+### 2. Retrieve all recipes
+**GET** `/recipes/`
 - **Description**: Retrieve all recipes.
 - **Authorization**: Admin or logged-in user.
 - **Response**: JSON object containing an array of recipes.
-- **Status Code**: `200` OK.
+- **Status Code**: 200 OK.
 
-### Retrieve a specific recipe
-
-**GET** `/:id`
-
+### 3. Retrieve a specific recipe
+**GET** `/recipes/:id`
 - **Description**: Retrieve a specific recipe by ID.
 - **Authorization**: Admin or logged-in user.
 - **Response**: JSON object containing recipe details, including ingredients and nutrients.
-- **Status Code**: `200` OK.
+- **Status Code**: 200 OK.
 
-### Update a recipe
-
-**PATCH** `/:id`
-
+### 4. Update a recipe
+**PATCH** `/recipes/:id`
 - **Description**: Update a specific recipe by ID.
 - **Body**: JSON object containing update details.
 - **Authorization**: Admin.
 - **Response**: JSON object containing updated recipe.
-- **Status Code**: `200` OK.
+- **Status Code**: 200 OK.
 
-### Delete a recipe
-
-**DELETE** `/:id`
-
+### 5. Delete a recipe
+**DELETE** `/recipes/:id`
 - **Description**: Delete a specific recipe by ID.
 - **Authorization**: Admin.
 - **Response**: JSON object containing deleted recipe ID.
-- **Status Code**: `200` OK.
+- **Status Code**: 200 OK.
+
+## Ingredients
+
+### 1. Create a new ingredient
+**POST** `/ingredients/`
+
+- **Description**: Create a new ingredient.
+- **Body**: JSON object containing ingredient details.
+- **Authorization**: Admin or Nutritionist.
+- **Response**: JSON object containing the created ingredient.
+- **Status Code**: 201 Created.
+
+### 2. Retrieve all ingredients
+**GET** `/ingredients/`
+  
+- **Description**: Retrieve all ingredients.
+- **Authorization**: Admin or logged-in user.
+- **Response**: JSON object containing an array of ingredients.
+- **Status Code**: 200 OK.
+
+### 3. Retrieve a specific ingredient
+**GET** `/ingredients/:id`
+
+- **Description**: Retrieve a specific ingredient by ID.
+- **Authorization**: Admin or logged-in user.
+- **Response**: JSON object containing ingredient details.
+- **Status Code**: 200 OK.
+
+### 4. Update an ingredient
+**PATCH** `/ingredients/:id`
+
+- **Description**: Update a specific ingredient by ID.
+- **Body**: JSON object containing update details.
+- **Authorization**: Admin.
+- **Response**: JSON object containing updated ingredient.
+- **Status Code**: 200 OK.
+
+### 5. Delete an ingredient 
+
+**DELETE** `/ingredients/:id`
+- **Description**: Delete a specific ingredient by ID.
+- **Authorization**: Admin.
+- **Response**: JSON object containing deleted ingredient ID.
+- **Status Code**: 200 OK.
 
 ## Meal Plans
 
