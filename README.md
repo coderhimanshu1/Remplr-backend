@@ -45,9 +45,7 @@ I’ll suggest using the following base URL which is already deployed:
 
 ## REMPLR Design Architecture
 
-
-<img width="2164" alt="REMPLR Design Architecture" src="https://github.com/coderhimanshu1/Remplr-backend/assets/87880250/546d1ac0-64b6-4666-a31a-549bd5e88e49">
-
+<img width="2762" alt="REMPLR Design Architecture (4)" src="https://github.com/coderhimanshu1/Remplr-backend/assets/87880250/8b6d208f-dfce-4f7f-9971-1e0c6f22b7aa">
 
 
 ## REMPLR Database Schema
