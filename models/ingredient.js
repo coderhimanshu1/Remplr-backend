@@ -118,13 +118,13 @@ class Ingredient {
     const querySql = `UPDATE ingredients 
                       SET ${setCols} 
                       WHERE id = ${idVarIdx} 
-                      RETURNING { id, 
+                      RETURNING  id, 
                                 aisle, 
                                 image, 
                                 name, 
                                 amount, 
                                 unit, 
-                                original as "details" }`;
+                                original as "details" `;
     const result = await db.query(querySql, [...values, id]);
     const ingredient = result.rows[0];
 
