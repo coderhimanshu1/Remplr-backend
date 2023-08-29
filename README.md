@@ -56,6 +56,49 @@ I’ll suggest using the following base URL which is already deployed:
 
 # Endpoints
 
+## Users:
+
+### 1. User Authentication
+**POST** `/auth/token`
+- **Description**: Authenticate a user.
+- **Body**: 
+  - `username`: Username of the user.
+  - `password`: Password of the user.
+- **Response**: 
+  - `{ token }`: JWT token which can be used to authenticate further requests.
+- **Authorization required**: None.
+- **Status Code**: Not specified (typically would be 200 OK).
+
+### 2. Add a New Client for a Nutritionist
+**POST** `/auth/client/new`
+- **Description**: Route to add a new client for a nutritionist.
+- **Body**: 
+  - `username`: Username of the client.
+  - `password`: Password of the client.
+  - `firstName`: First name of the client.
+  - `lastName`: Last name of the client.
+  - `email`: Email of the client.
+  - `nutritionist_username`: Username of the associated nutritionist.
+- **Response**: 
+  - `{ message: Client ${clientId} is now linked to Nutritionist ${nutritionistId} }`: Message indicating the client is now linked to a nutritionist.
+- **Authorization required**: Admin or Nutritionist.
+- **Status Code**: 201 Created.
+
+### 3. Nutritionist Registration
+**POST** `/auth/register`
+- **Description**: Registration route for nutritionists.
+- **Body**: 
+  - `username`: Username of the nutritionist.
+  - `password`: Password of the nutritionist.
+  - `firstName`: First name of the nutritionist.
+  - `lastName`: Last name of the nutritionist.
+  - `email`: Email of the nutritionist.
+- **Response**: 
+  - `{ token }`: JWT token which can be used to authenticate further requests.
+- **Authorization required**: None.
+- **Status Code**: 201 Created.
+
+
 ## Recipes
 
 ### 1. Create a new recipe
