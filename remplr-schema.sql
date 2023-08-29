@@ -36,9 +36,9 @@ CREATE TABLE IF NOT EXISTS client_nutritionist (
     client_id INT,
     nutritionist_id INT,
     FOREIGN KEY (client_id) REFERENCES users(id)
-        ON UPDATE CASCADE,
+        ON DELETE CASCADE ON UPDATE CASCADE
     FOREIGN KEY (nutritionist_id) REFERENCES users(id)
-        ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
         percentofdailyneeds NUMERIC,
         ingredient_id INT,
         FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
-        ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 --instructions table
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS instructions (
     number INT,
     step TEXT,
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- recipe nutrients table
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS recipe_nutrients (
     percentofdailyneeds DECIMAL,
     recipe_id INT,
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- recipetoingredients table
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS recipe_ingredients (
     ingredient_id INT,
     FOREIGN KEY (recipe_id) REFERENCES recipes(id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS meal_plans (
     created_by VARCHAR(255),
     user_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- meal_plan_recipes table
@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS meal_plan_recipes (
     meal_day VARCHAR(20),
     FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id),
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- user_saved_ingredients table
@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS user_saved_ingredients (
     ingredient_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- user_saved_recipes table
@@ -138,7 +138,7 @@ CREATE TABLE IF NOT EXISTS user_saved_recipes (
     recipe_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (recipe_id) REFERENCES recipes(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- user_saved_meal_plans table
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS user_saved_meal_plans (
     meal_plan_id INT,
     FOREIGN KEY (user_id) REFERENCES users(id),
     FOREIGN KEY (meal_plan_id) REFERENCES meal_plans(id)
-    ON UPDATE CASCADE
+    ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- shared meal plans
