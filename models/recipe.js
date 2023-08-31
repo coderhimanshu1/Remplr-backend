@@ -7,9 +7,35 @@ const { sqlForPartialUpdate } = require("../helpers/sql");
 class Recipe {
   /** Create a recipe (from data), update db, return new recipe data.
    *
-   * data should be { aisle, image, name, amount, unit, original }
+   * data should be { vegetarian,
+           vegan,
+           dairyfree,
+           weightwatchersmartpoints,
+           creditstext,
+           title,
+           readyinminutes,
+           servings,
+           sourceurl,
+           image,
+           imagetype as "imageType",
+           dishtype as "dishTypes",
+           diets,
+           summary }
    *
-   * Returns { id, aisle, image, name, amount, unit, details }
+   * Returns { id, vegetarian,
+           vegan,
+           dairyfree,
+           weightwatchersmartpoints,
+           creditstext,
+           title,
+           readyinminutes,
+           servings,
+           sourceurl,
+           image,
+           imagetype as "imageType",
+           dishtype as "dishTypes",
+           diets,
+           summary }
    **/
 
   static async create(data) {
@@ -28,24 +54,40 @@ class Recipe {
         dishtype,
         diets,
         summary)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING id,  
-           vegetarian,
-           vegan,
-           dairyfree,
-           weightwatchersmartpoints,
-           creditstext,
-           title,
-           readyinminutes,
-           servings,
-           sourceurl,
-           image,
-           imagetype as "imageType",
-           dishtype as "dishTypes",
-           diets,
-           summary`,
-      [data.aisle, data.image, data.name, data.amount, data.unit, data.original]
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+         RETURNING id,  
+         vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
+        image,
+        imagetype,
+        dishtype,
+        diets,
+        summary`,
+      [
+        data.vegetarian,
+        data.vegan,
+        data.dairyfree,
+        data.weightwatchersmartpoints,
+        data.creditstext,
+        data.title,
+        data.readyinminutes,
+        data.servings,
+        data.sourceurl,
+        data.image,
+        data.imagetype,
+        data.dishtype,
+        data.diets,
+        data.summary,
+      ]
     );
+
     let recipe = result.rows[0];
 
     return recipe;
@@ -53,7 +95,20 @@ class Recipe {
 
   /** Find all recipes
    *
-   * Returns [{ id, aisle, image, name, amount, unit, details }, ...]
+   * Returns [{ id, vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
+        image,
+        imagetype,
+        dishtype,
+        diets,
+        summary }, ...]
    * */
 
   static async findAll() {
@@ -90,7 +145,20 @@ class Recipe {
 
   /** Given a recipe id, return data about recipe.
    *
-   * Returns { id, aisle, image, name, amount, unit, details }
+   * Returns { id, vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
+        image,
+        imagetype,
+        dishtype,
+        diets,
+        summary}
    *
    * Throws NotFoundError if not found.
    **/
@@ -185,9 +253,35 @@ class Recipe {
    * This is a "partial update" --- it's fine if data doesn't contain
    * all the fields; this only changes provided ones.
    *
-   * Data can include: { aisle, image, name, amount, unit, original }
+   * Data can include: { vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
+        image,
+        imagetype,
+        dishtype,
+        diets,
+        summary }
    *
-   * Returns { id, aisle, image, name, amount, unit, details }
+   * Returns { id, vegetarian,
+        vegan,
+        dairyfree,
+        weightwatchersmartpoints,
+        creditstext,
+        title,
+        readyinminutes,
+        servings,
+        sourceurl,
+        image,
+        imagetype,
+        dishtype,
+        diets,
+        summary }
    *
    * Throws NotFoundError if not found.
    */
