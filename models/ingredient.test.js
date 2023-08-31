@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const Ingredient = require("./ingredient");
-const { NotFoundError } = require("../expressError");
+const { NotFoundError, BadRequestError } = require("../expressError");
 const {
   commonBeforeAll,
   commonBeforeEach,
@@ -118,4 +118,73 @@ describe("get ingredient by id", function () {
   });
 });
 
-// TODO:Add more tests for update and remove
+describe("update", function () {
+  const updateData = {
+    aisle: "UpdatedAisle",
+    image: "updated.jpg",
+    name: "UpdatedIngredient",
+    amount: "250",
+    unit: "ml",
+    original: "250ml UpdatedIngredient",
+  };
+
+  test("works", async function () {
+    let ingredient = await Ingredient.update(testIngredientIds[0], updateData);
+    expect(ingredient).toEqual({
+      id: testIngredientIds[0],
+      aisle: updateData.aisle,
+      image: updateData.image,
+      name: updateData.name,
+      amount: updateData.amount.toString(),
+      unit: updateData.unit,
+      details: updateData.original, // This is how it is returned from the database
+    });
+
+    const result = await db.query(`SELECT * FROM ingredients WHERE id = $1`, [
+      testIngredientIds[0],
+    ]);
+    expect(result.rows).toEqual([
+      {
+        id: testIngredientIds[0],
+        ...updateData,
+      },
+    ]);
+  });
+
+  test("not found if no such ingredient", async function () {
+    try {
+      await Ingredient.update(0, updateData);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("bad request with no data", async function () {
+    try {
+      await Ingredient.update(testIngredientIds[0], {});
+      fail();
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+  });
+});
+
+describe("remove", function () {
+  test("works", async function () {
+    await Ingredient.remove(testIngredientIds[1]);
+    const res = await db.query("SELECT id FROM ingredients WHERE id=$1", [
+      testIngredientIds[1],
+    ]);
+    expect(res.rows.length).toEqual(0);
+  });
+
+  test("not found if no such ingredient", async function () {
+    try {
+      await Ingredient.remove(0);
+      fail();
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});
