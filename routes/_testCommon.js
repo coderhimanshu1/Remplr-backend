@@ -8,10 +8,10 @@ const { createToken } = require("../helpers/tokens");
 const testIngredientIds = [];
 
 async function commonBeforeAll() {
-  // noinspection SqlWithoutWhere
-  await db.query("DELETE FROM users");
-  // noinspection SqlWithoutWhere
-  await db.query("DELETE FROM ingredients");
+  await db.query("DELETE FROM meal_plan_recipes");
+  await db.query("DELETE FROM meal_plans");
+  await db.query("DELETE FROM ingredients CASCADE");
+  await db.query("DELETE FROM users CASCADE");
 
   testIngredientIds[0] = (
     await Ingredient.create({

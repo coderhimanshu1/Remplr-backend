@@ -10,6 +10,8 @@ async function commonBeforeAll() {
   // Clean the database before tests
   await db.query("DELETE FROM ingredients CASCADE");
   await db.query("DELETE FROM ingredient_nutrients CASCADE");
+  await db.query("DELETE FROM meal_plan_recipes");
+  await db.query("DELETE FROM meal_plans");
 
   // Insert test ingredients into the database
   const resultsIngredients = await db.query(`
@@ -79,4 +81,7 @@ module.exports = {
   commonAfterEach,
   commonAfterAll,
   testIngredientIds,
+  testRecipeIds,
+  testUserIds,
+  testMealPlanIds,
 };
