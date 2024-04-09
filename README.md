@@ -41,7 +41,7 @@ http://localhost:3001/
 ```
 I’ll suggest using the following base URL which is already deployed:
 
-[https://jobly-backend.onrender.com/](https://remplr-backend.onrender.com)
+[https://remplr-backend.onrender.com/](https://remplr-backend.onrender.com)
 
 ## REMPLR Design Architecture
 
